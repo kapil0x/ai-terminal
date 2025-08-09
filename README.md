@@ -1,14 +1,19 @@
 # AI Terminal
 
-A terminal-based AI assistant that runs in Linux terminals.
+A powerful terminal-based AI assistant for developers. Features code review, refactoring, project analysis, and more.
 
 ## Features
 
 - 🤖 Interactive AI chat sessions
 - 💬 One-time question asking
-- 🔧 Easy configuration management
+- 🔍 **Code review and analysis**
+- 🔧 **Code refactoring suggestions**
+- 📊 **Project structure analysis**
+- 🚀 **Git changes review**
+- 🧪 **Test generation**
+- ⚙️ Easy configuration management
 - 🎨 Colorful terminal interface
-- 📊 Status monitoring
+- 📈 Status monitoring
 
 ## Installation
 
@@ -58,6 +63,41 @@ Type "exit" to quit the chat session.
 ```bash
 aiterm status
 ```
+
+## Developer Features
+
+### Code Review
+```bash
+aiterm review myfile.js
+```
+Analyzes code for quality, bugs, performance, and security issues.
+
+### Code Refactoring
+```bash
+aiterm refactor myfile.js
+```
+Suggests specific improvements and refactoring opportunities.
+
+### Project Analysis
+```bash
+aiterm analyze
+aiterm analyze ./src
+```
+Analyzes project structure, tech stack, and architecture.
+
+### Git Changes Review
+```bash
+aiterm gitreview
+aiterm gitreview --staged
+```
+Reviews git changes before committing.
+
+### Test Generation
+```bash
+aiterm test myfile.js
+aiterm test myfile.py -f pytest
+```
+Generates comprehensive tests for your code.
 
 ### Command options
 
