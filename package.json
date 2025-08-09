@@ -4,7 +4,7 @@
   "description": "A terminal-based AI assistant",
   "main": "index.js",
   "bin": {
-    "ai-term": "./index.js"
+    "aiterm": "./index.js"
   },
   "scripts": {
     "start": "node index.js",

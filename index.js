@@ -33,7 +33,7 @@ const config = {
 const program = new Command();
 
 program
-  .name('ai-term')
+  .name('aiterm')
   .description('Terminal-based AI assistant')
   .version('1.0.0');
 
