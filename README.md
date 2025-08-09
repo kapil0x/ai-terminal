@@ -69,8 +69,10 @@ aiterm status
 ### Code Review
 ```bash
 aiterm review myfile.js
+aiterm review myfile.js -t security
+aiterm review myfile.js -t team-standards
 ```
-Analyzes code for quality, bugs, performance, and security issues.
+Analyzes code for quality, bugs, performance, and security issues. Use custom templates for team-specific reviews.
 
 ### Code Refactoring
 ```bash
@@ -98,6 +100,36 @@ aiterm test myfile.js
 aiterm test myfile.py -f pytest
 ```
 Generates comprehensive tests for your code.
+
+## Review Templates
+
+Customize code reviews for your team's conventions:
+
+### Create a Template
+```bash
+aiterm template create my-team-style
+```
+Enter your template content with `{CODE}` placeholder. Type "END" when finished.
+
+### Use Templates
+```bash
+aiterm review file.js -t my-team-style
+aiterm review file.js -t security
+aiterm review file.js -t performance
+```
+
+### Manage Templates
+```bash
+aiterm template list          # List all templates
+aiterm template show security # Show template content
+aiterm template delete old    # Delete a template
+```
+
+### Built-in Templates
+- `security` - Security-focused review
+- `performance` - Performance optimization focus
+- `team-standards` - General coding standards
+- `junior-dev` - Educational reviews for learning
 
 ### Command options
 

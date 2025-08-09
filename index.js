@@ -194,6 +194,7 @@ program
   .command('review <file>')
   .description('Review code file and provide feedback')
   .option('-m, --model <model>', 'AI model to use', 'llama3-70b-8192')
+  .option('-t, --template <template>', 'Use specific review template')
   .action(async (file, options) => {
     const apiKey = config.get('apiKey');
     if (!apiKey) {
@@ -203,7 +204,21 @@ program
 
     try {
       const code = fs.readFileSync(file, 'utf8');
-      const prompt = `Please review this code and provide feedback on:
+      let prompt;
+      
+      if (options.template) {
+        // Use custom template
+        try {
+          const templatePath = path.join(templatesDir, `${options.template}.txt`);
+          const template = fs.readFileSync(templatePath, 'utf8');
+          prompt = template.replace('{CODE}', code);
+        } catch {
+          console.log(chalk.red(`❌ Template '${options.template}' not found`));
+          return;
+        }
+      } else {
+        // Use default review prompt
+        prompt = `Please review this code and provide feedback on:
 1. Code quality and best practices
 2. Potential bugs or issues
 3. Performance improvements
@@ -214,6 +229,7 @@ Code to review:
 \`\`\`
 ${code}
 \`\`\``;
+      }
 
       const spinner = ora('Reviewing code...').start();
       const response = await askAI(prompt, options.model);
@@ -411,6 +427,106 @@ ${code}
       console.log(chalk.red(`❌ Error: ${error.message}`));
     }
   });
+
+// Template Management
+const templatesDir = path.join(os.homedir(), '.ai-terminal-templates');
+
+// Ensure templates directory exists
+if (!fs.existsSync(templatesDir)) {
+  fs.mkdirSync(templatesDir, { recursive: true });
+}
+
+// Template commands
+program
+  .command('template')
+  .description('Manage review templates')
+  .addCommand(
+    new Command('create')
+      .argument('<name>', 'Template name')
+      .description('Create a new review template')
+      .action(async (name) => {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+
+        console.log(chalk.blue('📝 Creating review template. Enter template content:'));
+        console.log(chalk.gray('(Use {CODE} placeholder for the code to review)'));
+        console.log(chalk.gray('Press Ctrl+D when finished, or type "END" on a new line'));
+        
+        let templateContent = '';
+        
+        const readTemplate = () => {
+          rl.question('> ', (line) => {
+            if (line === 'END') {
+              if (!templateContent.includes('{CODE}')) {
+                templateContent += '\n\nCode to review:\n```\n{CODE}\n```';
+              }
+              
+              const templatePath = path.join(templatesDir, `${name}.txt`);
+              fs.writeFileSync(templatePath, templateContent);
+              console.log(chalk.green(`✓ Template '${name}' created successfully!`));
+              rl.close();
+              return;
+            }
+            templateContent += line + '\n';
+            readTemplate();
+          });
+        };
+        
+        readTemplate();
+      })
+  )
+  .addCommand(
+    new Command('list')
+      .description('List all review templates')
+      .action(() => {
+        try {
+          const templates = fs.readdirSync(templatesDir)
+            .filter(f => f.endsWith('.txt'))
+            .map(f => f.replace('.txt', ''));
+          
+          if (templates.length === 0) {
+            console.log(chalk.yellow('No templates found. Create one with: aiterm template create <name>'));
+            return;
+          }
+          
+          console.log(chalk.blue('📋 Available Templates:'));
+          templates.forEach(t => console.log(`  • ${chalk.yellow(t)}`));
+        } catch (error) {
+          console.log(chalk.red(`❌ Error: ${error.message}`));
+        }
+      })
+  )
+  .addCommand(
+    new Command('show')
+      .argument('<name>', 'Template name')
+      .description('Show template content')
+      .action((name) => {
+        try {
+          const templatePath = path.join(templatesDir, `${name}.txt`);
+          const content = fs.readFileSync(templatePath, 'utf8');
+          console.log(chalk.blue(`📄 Template: ${name}`));
+          console.log(chalk.white(content));
+        } catch (error) {
+          console.log(chalk.red(`❌ Template '${name}' not found`));
+        }
+      })
+  )
+  .addCommand(
+    new Command('delete')
+      .argument('<name>', 'Template name')
+      .description('Delete a template')
+      .action((name) => {
+        try {
+          const templatePath = path.join(templatesDir, `${name}.txt`);
+          fs.unlinkSync(templatePath);
+          console.log(chalk.green(`✓ Template '${name}' deleted`));
+        } catch (error) {
+          console.log(chalk.red(`❌ Template '${name}' not found`));
+        }
+      })
+  );
 
 async function askAI(question, model = 'llama3-70b-8192', conversation = []) {
   const apiKey = config.get('apiKey');
