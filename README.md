@@ -198,6 +198,56 @@ sudo chmod +x /usr/local/bin/aiterm
 - Internet connection
 - Valid AI service API key
 
+## Editor Integration
+
+### Vim/Neovim
+Add AI commands directly to your editor:
+
+**Quick Setup:**
+```bash
+# Add to ~/.vimrc
+cat vim-integration.vim >> ~/.vimrc
+
+# Or for Neovim, add to ~/.config/nvim/init.lua
+cat neovim-lua.lua >> ~/.config/nvim/init.lua
+```
+
+**Key Mappings (with leader key):**
+- `<leader>ar` - Review current file
+- `<leader>af` - Auto-fix current file  
+- `<leader>at` - Generate tests
+- `<leader>am` - Modify with prompt
+- `<leader>aa` - Ask AI question
+- `<leader>ae` - Explain selected code (visual mode)
+
+**Manual Commands:**
+```vim
+:! aiterm review %
+:! aiterm fix % --backup
+:! aiterm modify % "add error handling"
+```
+
+### Emacs
+```elisp
+;; Add to ~/.emacs
+(load-file "path/to/emacs-integration.el")
+
+;; Key bindings: C-c a <key>
+;; C-c a r - Review file
+;; C-c a f - Fix file
+;; C-c a m - Modify file
+```
+
+### VS Code
+Add snippets from `vscode-integration.json` to your VS Code snippets for quick AI command insertion.
+
+### Any Editor
+Run AI commands from integrated terminal:
+```bash
+aiterm review current-file.js
+aiterm modify app.py "convert to async"
+```
+
 ## License
 
 MIT

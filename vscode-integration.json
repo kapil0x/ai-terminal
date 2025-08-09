@@ -1,0 +1,36 @@
+{
+  "ai-terminal.review": {
+    "prefix": "aiterm-review",
+    "body": [
+      "// AI Review: Run 'aiterm review ${TM_FILENAME}' to analyze this file"
+    ],
+    "description": "Add AI review comment"
+  },
+  "ai-terminal.modify": {
+    "prefix": "aiterm-modify",
+    "body": [
+      "// AI Modify: Run 'aiterm modify ${TM_FILENAME} \"${1:your prompt}\"' to modify this file"
+    ],
+    "description": "Add AI modification comment"
+  },
+  "ai-terminal.test": {
+    "prefix": "aiterm-test",
+    "body": [
+      "// AI Test: Run 'aiterm test ${TM_FILENAME}' to generate tests"
+    ],
+    "description": "Add AI test generation comment"
+  },
+  "ai-terminal.tasks": {
+    "prefix": "aiterm-tasks",
+    "body": [
+      "// AI Commands available:",
+      "// aiterm review ${TM_FILENAME}     - Review this file",
+      "// aiterm fix ${TM_FILENAME}        - Auto-fix issues", 
+      "// aiterm test ${TM_FILENAME}       - Generate tests",
+      "// aiterm modify ${TM_FILENAME} \"prompt\" - Modify with AI",
+      "// aiterm analyze                   - Analyze project",
+      "// aiterm gitreview                 - Review git changes"
+    ],
+    "description": "Insert AI Terminal command reference"
+  }
+}
