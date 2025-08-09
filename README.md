@@ -11,6 +11,9 @@ A powerful terminal-based AI assistant for developers. Features code review, ref
 - 📊 **Project structure analysis**
 - 🚀 **Git changes review**
 - 🧪 **Test generation**
+- ✏️ **Code modification with natural language**
+- 🔧 **Auto-fix common issues**
+- 📝 **Custom review templates**
 - ⚙️ Easy configuration management
 - 🎨 Colorful terminal interface
 - 📈 Status monitoring
@@ -106,6 +109,20 @@ aiterm test myfile.js
 aiterm test myfile.py -f pytest
 ```
 Generates comprehensive tests for your code.
+
+### Code Modification
+```bash
+aiterm modify myfile.js "add error handling to all functions"
+aiterm modify app.py "convert this to use async/await"
+aiterm modify style.css "make this responsive" --preview
+```
+Modify code using natural language prompts with AI assistance.
+
+### Auto-Fix Issues
+```bash
+aiterm fix myfile.js --backup
+```
+Automatically fixes common code issues and bugs.
 
 ## Review Templates
 

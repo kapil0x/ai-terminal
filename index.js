@@ -595,6 +595,172 @@ program
     }
   });
 
+// Code Modification command
+program
+  .command('modify <file> <prompt>')
+  .description('Modify code file based on natural language prompt')
+  .option('-m, --model <model>', 'AI model to use', 'llama3-70b-8192')
+  .option('--backup', 'Create backup before modifying')
+  .option('--preview', 'Show changes without applying them')
+  .action(async (file, prompt, options) => {
+    const apiKey = config.get('apiKey');
+    if (!apiKey) {
+      console.log(chalk.red('❌ No API key configured. Run: aiterm config'));
+      return;
+    }
+
+    try {
+      // Check if file exists
+      if (!fs.existsSync(file)) {
+        console.log(chalk.red(`❌ File '${file}' not found`));
+        return;
+      }
+
+      const originalCode = fs.readFileSync(file, 'utf8');
+      
+      // Create backup if requested
+      if (options.backup) {
+        const backupPath = `${file}.backup.${Date.now()}`;
+        fs.writeFileSync(backupPath, originalCode);
+        console.log(chalk.green(`💾 Backup created: ${backupPath}`));
+      }
+
+      const modificationPrompt = `You are a code modification assistant. Based on the user's request, modify the provided code and return ONLY the complete modified code.
+
+User Request: ${prompt}
+
+Original Code:
+\`\`\`
+${originalCode}
+\`\`\`
+
+IMPORTANT: 
+- Return ONLY the complete modified code, no explanations
+- Maintain the original file structure and formatting style
+- Ensure the code remains functional and follows best practices
+- If the request is unclear or unsafe, explain why instead of modifying`;
+
+      const spinner = ora('Modifying code...').start();
+      const response = await askAI(modificationPrompt, options.model);
+      spinner.stop();
+      
+      // Extract code from response (remove markdown if present)
+      let modifiedCode = response;
+      if (response.includes('```')) {
+        const codeBlocks = response.match(/```[\s\S]*?```/g);
+        if (codeBlocks && codeBlocks.length > 0) {
+          modifiedCode = codeBlocks[0].replace(/```\w*\n?/g, '').replace(/```$/g, '');
+        }
+      }
+      
+      if (options.preview) {
+        console.log(chalk.blue('🔍 Preview of Changes:'));
+        console.log(chalk.green('--- Original'));
+        console.log(chalk.red('+++ Modified'));
+        console.log(chalk.white(modifiedCode));
+        console.log(chalk.yellow('\n💡 Use without --preview to apply changes'));
+        return;
+      }
+      
+      // Show confirmation prompt
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      
+      console.log(chalk.blue('🔧 Code Modified. Preview:'));
+      console.log(chalk.gray('--- First 10 lines ---'));
+      console.log(modifiedCode.split('\n').slice(0, 10).join('\n'));
+      console.log(chalk.gray('--- ... ---'));
+      
+      rl.question(chalk.yellow('Apply changes? (y/N): '), (answer) => {
+        if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+          fs.writeFileSync(file, modifiedCode);
+          console.log(chalk.green(`✅ File '${file}' modified successfully!`));
+        } else {
+          console.log(chalk.yellow('❌ Changes cancelled'));
+        }
+        rl.close();
+      });
+      
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Quick Fix command
+program
+  .command('fix <file>')
+  .description('Auto-fix common issues in code')
+  .option('-m, --model <model>', 'AI model to use', 'llama3-70b-8192')
+  .option('--backup', 'Create backup before fixing')
+  .action(async (file, options) => {
+    const apiKey = config.get('apiKey');
+    if (!apiKey) {
+      console.log(chalk.red('❌ No API key configured. Run: aiterm config'));
+      return;
+    }
+
+    try {
+      const originalCode = fs.readFileSync(file, 'utf8');
+      
+      if (options.backup) {
+        const backupPath = `${file}.backup.${Date.now()}`;
+        fs.writeFileSync(backupPath, originalCode);
+        console.log(chalk.green(`💾 Backup created: ${backupPath}`));
+      }
+
+      const fixPrompt = `Fix common issues in this code:
+1. Syntax errors
+2. Unused variables
+3. Missing error handling
+4. Code style issues
+5. Performance issues
+6. Security vulnerabilities
+
+Return ONLY the fixed code, no explanations.
+
+Code to fix:
+\`\`\`
+${originalCode}
+\`\`\``;
+
+      const spinner = ora('Auto-fixing code...').start();
+      const response = await askAI(fixPrompt, options.model);
+      spinner.stop();
+      
+      let fixedCode = response;
+      if (response.includes('```')) {
+        const codeBlocks = response.match(/```[\s\S]*?```/g);
+        if (codeBlocks && codeBlocks.length > 0) {
+          fixedCode = codeBlocks[0].replace(/```\w*\n?/g, '').replace(/```$/g, '');
+        }
+      }
+      
+      console.log(chalk.blue('🔧 Auto-fix Results:'));
+      console.log(chalk.green('Fixed code preview (first 10 lines):'));
+      console.log(fixedCode.split('\n').slice(0, 10).join('\n'));
+      
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      
+      rl.question(chalk.yellow('Apply fixes? (y/N): '), (answer) => {
+        if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes') {
+          fs.writeFileSync(file, fixedCode);
+          console.log(chalk.green(`✅ File '${file}' fixed successfully!`));
+        } else {
+          console.log(chalk.yellow('❌ Fixes cancelled'));
+        }
+        rl.close();
+      });
+      
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
 async function askAI(question, model = 'llama3-70b-8192', conversation = []) {
   const apiKey = config.get('apiKey');
   const apiUrl = config.get('apiUrl', 'https://api.groq.com/openai/v1');
