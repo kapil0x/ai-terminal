@@ -64,6 +64,12 @@ Type "exit" to quit the chat session.
 aiterm status
 ```
 
+### Update to Latest Version
+```bash
+aiterm update
+```
+Automatically pulls latest code from GitHub and updates global installation.
+
 ## Developer Features
 
 ### Code Review

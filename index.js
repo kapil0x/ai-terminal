@@ -528,6 +528,73 @@ program
       })
   );
 
+// Update command
+program
+  .command('update')
+  .description('Update ai-terminal to latest version')
+  .action(async () => {
+    const spinner = ora('Checking for updates...').start();
+    
+    try {
+      const { spawn } = require('child_process');
+      const appDir = path.join(os.homedir(), 'ai-term', 'ai-terminal');
+      
+      // Check if git repo exists
+      if (!fs.existsSync(path.join(appDir, '.git'))) {
+        spinner.stop();
+        console.log(chalk.yellow('⚠️  Git repository not found. Cloning fresh copy...'));
+        
+        // Clone the repo
+        const cloneSpinner = ora('Cloning repository...').start();
+        await new Promise((resolve, reject) => {
+          const child = spawn('git', ['clone', 'https://github.com/kapil0x/ai-terminal.git', appDir], {
+            stdio: 'pipe'
+          });
+          child.on('close', (code) => code === 0 ? resolve() : reject(new Error('Failed to clone repository')));
+        });
+        cloneSpinner.stop();
+      } else {
+        // Pull latest changes
+        spinner.text = 'Pulling latest changes...';
+        await new Promise((resolve, reject) => {
+          const child = spawn('git', ['pull', 'origin', 'main'], {
+            cwd: appDir,
+            stdio: 'pipe'
+          });
+          child.on('close', (code) => code === 0 ? resolve() : reject(new Error('Failed to pull updates')));
+        });
+      }
+      
+      // Install dependencies
+      spinner.text = 'Installing dependencies...';
+      await new Promise((resolve, reject) => {
+        const child = spawn('npm', ['install'], {
+          cwd: appDir,
+          stdio: 'pipe'
+        });
+        child.on('close', (code) => code === 0 ? resolve() : reject(new Error('Failed to install dependencies')));
+      });
+      
+      // Update global installation
+      spinner.text = 'Updating global installation...';
+      await new Promise((resolve, reject) => {
+        const child = spawn('sudo', ['cp', path.join(appDir, 'ai-term-standalone.js'), '/usr/local/bin/aiterm'], {
+          stdio: 'pipe'
+        });
+        child.on('close', (code) => code === 0 ? resolve() : reject(new Error('Failed to update global installation')));
+      });
+      
+      spinner.stop();
+      console.log(chalk.green('✅ ai-terminal updated successfully!'));
+      console.log(chalk.blue('🚀 You can now use the latest features'));
+      
+    } catch (error) {
+      spinner.stop();
+      console.log(chalk.red(`❌ Update failed: ${error.message}`));
+      console.log(chalk.yellow('💡 Try manual update: git pull origin main'));
+    }
+  });
+
 async function askAI(question, model = 'llama3-70b-8192', conversation = []) {
   const apiKey = config.get('apiKey');
   const apiUrl = config.get('apiUrl', 'https://api.groq.com/openai/v1');
