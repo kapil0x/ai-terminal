@@ -1,0 +1,22 @@
+{
+  "name": "ai-terminal",
+  "version": "1.0.0",
+  "description": "A terminal-based AI assistant",
+  "main": "index.js",
+  "bin": {
+    "ai-term": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["ai", "terminal", "cli", "assistant"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "axios": "^1.4.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1"
+  }
+}
