@@ -241,6 +241,20 @@ cat neovim-lua.lua >> ~/.config/nvim/init.lua
 ### VS Code
 Add snippets from `vscode-integration.json` to your VS Code snippets for quick AI command insertion.
 
+### Command Shortcuts
+Create short aliases for faster usage:
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+source aliases.sh
+
+# Now use short commands:
+arev myfile.js              # aiterm review
+amod myfile.js "prompt"     # aiterm modify  
+afix myfile.js              # aiterm fix
+aask "question"             # aiterm ask
+achat                       # aiterm chat
+```
+
 ### Any Editor
 Run AI commands from integrated terminal:
 ```bash
