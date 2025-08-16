@@ -124,6 +124,44 @@ aiterm fix myfile.js --backup
 ```
 Automatically fixes common code issues and bugs.
 
+## 🧠 Codebase Learning (Unique Feature!)
+
+Unlike other AI tools, ai-terminal learns your specific codebase and team conventions:
+
+### Learn Your Codebase
+```bash
+aiterm learn                    # Analyze current project
+aiterm learn --directory ./src  # Learn from specific directory
+```
+AI studies your code patterns, architecture, and conventions.
+
+### Add Custom Context
+```bash
+aiterm remember "We use Redux for state management"
+aiterm remember "Always validate inputs in API endpoints"
+aiterm remember "Follow functional programming patterns"
+```
+
+### View Learned Knowledge
+```bash
+aiterm context
+```
+Shows what the AI has learned about your project.
+
+### Context-Aware Commands
+Once learned, ALL commands use your project context:
+- Reviews follow YOUR conventions
+- Modifications match YOUR patterns  
+- Suggestions align with YOUR architecture
+- Code generation uses YOUR style
+
+**Example:**
+```bash
+aiterm learn                           # Learn project patterns
+aiterm remember "We use async/await"   # Add team preference
+aiterm review file.js                  # Now uses learned context!
+```
+
 ## Review Templates
 
 Customize code reviews for your team's conventions:

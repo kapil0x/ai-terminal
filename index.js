@@ -430,10 +430,14 @@ ${code}
 
 // Template Management
 const templatesDir = path.join(os.homedir(), '.ai-terminal-templates');
+const contextDir = path.join(os.homedir(), '.ai-terminal-context');
 
-// Ensure templates directory exists
+// Ensure directories exist
 if (!fs.existsSync(templatesDir)) {
   fs.mkdirSync(templatesDir, { recursive: true });
+}
+if (!fs.existsSync(contextDir)) {
+  fs.mkdirSync(contextDir, { recursive: true });
 }
 
 // Template commands
@@ -761,12 +765,207 @@ ${originalCode}
     }
   });
 
-async function askAI(question, model = 'llama3-70b-8192', conversation = []) {
+// Codebase Learning System
+program
+  .command('learn')
+  .description('Learn your codebase patterns and conventions')
+  .option('-d, --directory <dir>', 'Directory to learn from', '.')
+  .option('-m, --model <model>', 'AI model to use', 'llama3-70b-8192')
+  .action(async (options) => {
+    const apiKey = config.get('apiKey');
+    if (!apiKey) {
+      console.log(chalk.red('❌ No API key configured. Run: aiterm config'));
+      return;
+    }
+
+    const spinner = ora('Learning your codebase...').start();
+    
+    try {
+      const { spawn } = require('child_process');
+      
+      // Find code files
+      const findFiles = await new Promise((resolve) => {
+        const child = spawn('find', [options.directory, '-type', 'f', '(', '-name', '*.js', '-o', '-name', '*.ts', '-o', '-name', '*.py', '-o', '-name', '*.java', '-o', '-name', '*.cpp', '-o', '-name', '*.c', '-o', '-name', '*.go', '-o', '-name', '*.rs', '-o', '-name', '*.php', ')'], { cwd: process.cwd() });
+        let output = '';
+        child.stdout.on('data', (data) => output += data);
+        child.on('close', () => resolve(output));
+      });
+
+      const files = findFiles.trim().split('\n').filter(f => f && !f.includes('node_modules') && !f.includes('.git')).slice(0, 50);
+      
+      if (files.length === 0) {
+        spinner.stop();
+        console.log(chalk.yellow('No code files found to learn from'));
+        return;
+      }
+
+      // Sample files for analysis
+      const sampleFiles = files.slice(0, 10);
+      let codebaseContent = '';
+      
+      for (const file of sampleFiles) {
+        try {
+          const content = fs.readFileSync(file, 'utf8');
+          codebaseContent += `\n--- ${file} ---\n${content.slice(0, 2000)}\n`;
+        } catch {}
+      }
+
+      // Check for config files
+      let projectContext = '';
+      const configFiles = ['package.json', 'requirements.txt', 'Cargo.toml', 'pom.xml', 'go.mod'];
+      for (const configFile of configFiles) {
+        const configPath = path.join(options.directory, configFile);
+        if (fs.existsSync(configPath)) {
+          const content = fs.readFileSync(configPath, 'utf8');
+          projectContext += `\n--- ${configFile} ---\n${content}\n`;
+        }
+      }
+
+      const learningPrompt = `Analyze this codebase and learn the patterns, conventions, and architecture. Focus on:
+
+1. **Code Style & Conventions**: Naming, formatting, structure patterns
+2. **Architecture Patterns**: How components/modules are organized
+3. **Technology Stack**: Frameworks, libraries, tools used
+4. **Error Handling**: How errors are typically handled
+5. **Testing Patterns**: Testing approaches and conventions
+6. **Documentation Style**: Comment patterns and documentation approaches
+
+Project Configuration:
+${projectContext}
+
+Sample Code Files:
+${codebaseContent}
+
+Provide a comprehensive analysis that can be used to maintain consistency in future code reviews and modifications.`;
+
+      spinner.text = 'Analyzing codebase patterns...';
+      const analysis = await askAI(learningPrompt, options.model);
+      spinner.stop();
+      
+      // Save learned context
+      const contextFile = path.join(contextDir, 'codebase-analysis.json');
+      const contextData = {
+        timestamp: new Date().toISOString(),
+        directory: options.directory,
+        filesAnalyzed: files.length,
+        analysis: analysis,
+        fileList: files
+      };
+      
+      fs.writeFileSync(contextFile, JSON.stringify(contextData, null, 2));
+      
+      console.log(chalk.green(`✅ Learned from ${files.length} files in ${options.directory}`));
+      console.log(chalk.blue('🧠 Codebase Analysis:'));
+      console.log(chalk.white(analysis));
+      console.log(chalk.gray(`\n💾 Context saved for future AI commands`));
+      
+    } catch (error) {
+      spinner.stop();
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Remember command
+program
+  .command('remember <note>')
+  .description('Add custom context about your project')
+  .action((note) => {
+    try {
+      const contextFile = path.join(contextDir, 'custom-notes.json');
+      let notes = [];
+      
+      if (fs.existsSync(contextFile)) {
+        notes = JSON.parse(fs.readFileSync(contextFile, 'utf8'));
+      }
+      
+      notes.push({
+        timestamp: new Date().toISOString(),
+        note: note
+      });
+      
+      fs.writeFileSync(contextFile, JSON.stringify(notes, null, 2));
+      console.log(chalk.green(`✅ Remembered: "${note}"`));
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Context command
+program
+  .command('context')
+  .description('Show learned codebase context')
+  .action(() => {
+    try {
+      console.log(chalk.blue('🧠 Learned Codebase Context:'));
+      
+      // Show codebase analysis
+      const analysisFile = path.join(contextDir, 'codebase-analysis.json');
+      if (fs.existsSync(analysisFile)) {
+        const analysis = JSON.parse(fs.readFileSync(analysisFile, 'utf8'));
+        console.log(chalk.yellow(`\n📊 Last Analysis: ${new Date(analysis.timestamp).toLocaleString()}`));
+        console.log(chalk.white(`Directory: ${analysis.directory}`));
+        console.log(chalk.white(`Files: ${analysis.filesAnalyzed}`));
+        console.log(chalk.gray('\n--- Analysis Summary ---'));
+        console.log(analysis.analysis.slice(0, 500) + '...');
+      } else {
+        console.log(chalk.yellow('No codebase analysis found. Run: aiterm learn'));
+      }
+      
+      // Show custom notes
+      const notesFile = path.join(contextDir, 'custom-notes.json');
+      if (fs.existsSync(notesFile)) {
+        const notes = JSON.parse(fs.readFileSync(notesFile, 'utf8'));
+        console.log(chalk.blue('\n📝 Custom Notes:'));
+        notes.slice(-5).forEach(note => {
+          console.log(chalk.gray(`${new Date(note.timestamp).toLocaleDateString()}: ${note.note}`));
+        });
+      }
+      
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Helper function to get learned context
+function getLearnedContext() {
+  let context = '';
+  
+  try {
+    // Get codebase analysis
+    const analysisFile = path.join(contextDir, 'codebase-analysis.json');
+    if (fs.existsSync(analysisFile)) {
+      const analysis = JSON.parse(fs.readFileSync(analysisFile, 'utf8'));
+      context += `\n--- Learned Codebase Context ---\n${analysis.analysis}\n`;
+    }
+    
+    // Get custom notes
+    const notesFile = path.join(contextDir, 'custom-notes.json');
+    if (fs.existsSync(notesFile)) {
+      const notes = JSON.parse(fs.readFileSync(notesFile, 'utf8'));
+      const recentNotes = notes.slice(-3).map(n => n.note).join('\n');
+      context += `\n--- Custom Project Notes ---\n${recentNotes}\n`;
+    }
+  } catch {}
+  
+  return context;
+}
+
+async function askAI(question, model = 'llama3-70b-8192', conversation = [], useContext = true) {
   const apiKey = config.get('apiKey');
   const apiUrl = config.get('apiUrl', 'https://api.groq.com/openai/v1');
   
+  let finalQuestion = question;
+  
+  // Add learned context to question if available
+  if (useContext) {
+    const context = getLearnedContext();
+    if (context) {
+      finalQuestion = `${context}\n\n--- User Request ---\n${question}`;
+    }
+  }
+  
   const messages = conversation.length > 0 ? conversation : [
-    { role: 'user', content: question }
+    { role: 'user', content: finalQuestion }
   ];
 
   const response = await axios.post(`${apiUrl}/chat/completions`, {
