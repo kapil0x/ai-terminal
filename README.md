@@ -124,9 +124,9 @@ aiterm fix myfile.js --backup
 ```
 Automatically fixes common code issues and bugs.
 
-## 🧠 Codebase Learning (Unique Feature!)
+## 🧠 Local ML + Codebase Learning (Revolutionary!)
 
-Unlike other AI tools, ai-terminal learns your specific codebase and team conventions:
+Unlike other AI tools, ai-terminal combines local machine learning with cloud LLMs for superior context understanding:
 
 ### Learn Your Codebase
 ```bash
@@ -155,12 +155,27 @@ Once learned, ALL commands use your project context:
 - Suggestions align with YOUR architecture
 - Code generation uses YOUR style
 
-**Example:**
+### 🤖 Advanced: Local ML Embeddings
 ```bash
-aiterm learn                           # Learn project patterns
-aiterm remember "We use async/await"   # Add team preference
-aiterm review file.js                  # Now uses learned context!
+aiterm embed-learn                     # Generate CodeT5 embeddings
+aiterm search "authentication logic"   # Semantic code search
+aiterm benchmark                       # Compare vs other AI tools
 ```
+Uses local CodeT5 model for semantic understanding and smart context selection.
+
+**Example Workflow:**
+```bash
+aiterm embed-learn                     # Build local embeddings
+aiterm learn                           # Learn project patterns  
+aiterm remember "We use async/await"   # Add team preference
+aiterm review file.js                  # Now uses ML + context!
+```
+
+**🎯 Why This Beats Copilot/Cursor/Claude Code:**
+- **Local ML**: CodeT5 embeddings for semantic understanding
+- **Smart Context**: Only sends relevant code patterns to LLM
+- **Persistent Memory**: Learns once, applies forever
+- **Hybrid Architecture**: Local intelligence + cloud generation
 
 ## Review Templates
 

@@ -431,6 +431,8 @@ ${code}
 // Template Management
 const templatesDir = path.join(os.homedir(), '.ai-terminal-templates');
 const contextDir = path.join(os.homedir(), '.ai-terminal-context');
+const CodeEmbeddings = require('./embeddings');
+const ContextEvaluator = require('./evaluation');
 
 // Ensure directories exist
 if (!fs.existsSync(templatesDir)) {
@@ -765,6 +767,190 @@ ${originalCode}
     }
   });
 
+// Advanced Embedding System
+program
+  .command('embed-learn')
+  .description('Generate embeddings for codebase using local ML model')
+  .option('-d, --directory <dir>', 'Directory to learn from', '.')
+  .action(async (options) => {
+    const spinner = ora('Initializing CodeT5 model...').start();
+    
+    try {
+      const embeddings = new CodeEmbeddings();
+      await embeddings.initialize();
+      
+      spinner.text = 'Scanning codebase for files...';
+      
+      // Find code files using a more reliable approach
+      const findCodeFiles = (dir) => {
+        const files = [];
+        const fs = require('fs');
+        const path = require('path');
+        
+        function scanDir(currentDir) {
+          try {
+            const items = fs.readdirSync(currentDir);
+            for (const item of items) {
+              if (item.startsWith('.') || item === 'node_modules') continue;
+              
+              const fullPath = path.join(currentDir, item);
+              const stat = fs.statSync(fullPath);
+              
+              if (stat.isDirectory()) {
+                scanDir(fullPath);
+              } else {
+                const ext = path.extname(fullPath).toLowerCase();
+                if (['.js', '.ts', '.py', '.java', '.cpp', '.c', '.go', '.rs', '.php', '.jsx', '.tsx'].includes(ext)) {
+                  files.push(fullPath);
+                }
+              }
+            }
+          } catch (error) {
+            // Skip directories that can't be read
+          }
+        }
+        
+        scanDir(dir);
+        return files;
+      };
+      
+      const files = findCodeFiles(options.directory);
+      
+      
+      if (files.length === 0) {
+        spinner.stop();
+        console.log(chalk.yellow('No code files found to embed'));
+        return;
+      }
+
+      spinner.text = `Generating embeddings for ${files.length} files...`;
+      
+      let processed = 0;
+      for (const file of files) {
+        try {
+          const content = fs.readFileSync(file, 'utf8');
+          await embeddings.embedFile(file, content);
+          processed++;
+          
+          if (processed % 5 === 0) {
+            spinner.text = `Embedded ${processed}/${files.length} files...`;
+          }
+        } catch (error) {
+          // Skip files that can't be read
+          continue;
+        }
+      }
+      
+      await embeddings.close();
+      spinner.stop();
+      
+      console.log(chalk.green(`✅ Successfully embedded ${processed} files`));
+      console.log(chalk.blue('🧠 Local ML model ready for semantic code search'));
+      console.log(chalk.gray('💡 All AI commands now use smart context selection'));
+      
+    } catch (error) {
+      spinner.stop();
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Smart Context Search
+program
+  .command('search <query>')
+  .description('Semantic search through codebase using embeddings')
+  .option('-l, --limit <number>', 'Number of results', '5')
+  .action(async (query, options) => {
+    const spinner = ora('Searching codebase...').start();
+    
+    try {
+      const embeddings = new CodeEmbeddings();
+      await embeddings.initialize();
+      
+      // Generate embedding for query
+      const queryEmbedding = await embeddings.generateEmbedding(query);
+      
+      // Find similar code
+      const results = await embeddings.findSimilar(queryEmbedding, parseInt(options.limit));
+      
+      await embeddings.close();
+      spinner.stop();
+      
+      console.log(chalk.blue(`🔍 Search results for: "${query}"`));
+      
+      results.forEach((result, index) => {
+        console.log(chalk.yellow(`\n${index + 1}. ${result.filePath}`));
+        console.log(chalk.gray(`   Similarity: ${(result.similarity * 100).toFixed(1)}%`));
+        console.log(chalk.gray(`   Language: ${result.metadata.language}`));
+        if (result.metadata.functions.length > 0) {
+          console.log(chalk.gray(`   Functions: ${result.metadata.functions.slice(0, 3).join(', ')}`));
+        }
+      });
+      
+    } catch (error) {
+      spinner.stop();
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// Evaluation System
+program
+  .command('benchmark')
+  .description('Benchmark context awareness against other AI tools')
+  .action(async () => {
+    const evaluator = new ContextEvaluator();
+    const results = await evaluator.runBenchmark();
+    
+    console.log(chalk.blue('\n📈 Benchmark Results:'));
+    console.log(`Test cases prepared: ${results.testCases}`);
+    console.log(`Expected improvement: ${((results.baselines.ourTool - results.baselines.copilot) * 100).toFixed(1)}% over Copilot`);
+    console.log(`Expected improvement: ${((results.baselines.ourTool - results.baselines.cursor) * 100).toFixed(1)}% over Cursor`);
+    console.log(`Expected improvement: ${((results.baselines.ourTool - results.baselines.claudeCode) * 100).toFixed(1)}% over Claude Code`);
+    
+    console.log(chalk.green('\n🚀 To validate these claims:'));
+    console.log('1. Run: aiterm embed-learn (build embeddings)');
+    console.log('2. Test: aiterm review <file> (context-aware)');
+    console.log('3. Compare: Same query in Copilot/Cursor');
+    console.log('4. Measure: Project-specific understanding');
+    console.log('5. Run: aiterm real-test (automated comparison)');
+  });
+
+// Real Testing Commands
+program
+  .command('real-test')
+  .description('Run real comparison test against generic AI')
+  .option('-d, --directory <dir>', 'Directory to test', '.')
+  .action(async (options) => {
+    const RealBenchmark = require('./real-benchmark.js');
+    const benchmark = new RealBenchmark();
+    
+    console.log(chalk.blue('🔬 Running Real Comparison Test'));
+    console.log(chalk.gray(`Testing on: ${options.directory}\n`));
+    
+    try {
+      await benchmark.runBenchmark(options.directory);
+    } catch (error) {
+      console.log(chalk.red(`❌ Test failed: ${error.message}`));
+    }
+  });
+
+program
+  .command('api-test')
+  .description('Run real API comparison with actual AI calls')
+  .option('-d, --directory <dir>', 'Directory to test', '.')
+  .action(async (options) => {
+    const APIComparisonTest = require('./api-comparison-test.js');
+    const tester = new APIComparisonTest();
+    
+    console.log(chalk.blue('🚀 AI Terminal vs Generic AI - Real API Test'));
+    console.log(chalk.gray(`Testing on: ${options.directory}\n`));
+    
+    try {
+      await tester.runComparison(options.directory);
+    } catch (error) {
+      console.log(chalk.red(`❌ API test failed: ${error.message}`));
+    }
+  });
+
 // Codebase Learning System
 program
   .command('learn')
@@ -890,6 +1076,173 @@ program
     }
   });
 
+// Advanced code analysis command
+program
+  .command('analyze-code <file>')
+  .description('Advanced code analysis with specific references and insights')
+  .option('-m, --model <model>', 'AI model to use', 'llama3-70b-8192')
+  .action(async (file, options) => {
+    const apiKey = config.get('apiKey');
+    if (!apiKey) {
+      console.log(chalk.red('❌ No API key configured. Run: aiterm config'));
+      return;
+    }
+
+    try {
+      const code = fs.readFileSync(file, 'utf8');
+      const lines = code.split('\n');
+      
+      // Get detailed analysis using embeddings
+      const embeddings = new CodeEmbeddings();
+      await embeddings.initialize();
+      
+      // Get file metadata
+      const metadata = embeddings.extractEnhancedMetadata(file, code);
+      
+      // Find similar files
+      const fileEmbedding = await embeddings.generateEmbedding(code);
+      const similarFiles = await embeddings.findSimilar(fileEmbedding, 3);
+      
+      await embeddings.close();
+      
+      // Create detailed analysis prompt (optimized for large files)
+      const maxLines = 150; // Limit for very large files
+      const codeToAnalyze = lines.length > maxLines 
+        ? lines.slice(0, maxLines).map((line, i) => `${(i + 1).toString().padStart(3, ' ')}: ${line}`).join('\n') + `\n... (truncated after ${maxLines} lines)`
+        : lines.map((line, i) => `${(i + 1).toString().padStart(3, ' ')}: ${line}`).join('\n');
+        
+      const analysisPrompt = `Perform advanced analysis of this code file with specific line references and detailed insights.
+
+📁 File: ${file}
+🔤 Language: ${metadata.language}
+📊 Stats: ${metadata.lines} lines, ${metadata.functions.length} functions, complexity ${metadata.complexity}
+🛡️ Security: ${metadata.security.vulnerabilities.length > 0 ? metadata.security.vulnerabilities.join(', ') : 'No issues detected'}
+🔧 Error handling: ${metadata.errorHandling.hasErrorHandling ? `${metadata.errorHandling.tryBlocks} try blocks` : 'Missing'}
+
+🔍 Similar files:
+${similarFiles.slice(0, 2).map(f => `- ${f.filePath} (${(f.similarity * 100).toFixed(1)}% similar)`).join('\n')}
+
+📝 Code analysis:
+\`\`\`${metadata.language}
+${codeToAnalyze}
+\`\`\`
+
+Provide analysis with specific line references:
+1. **Security Issues** - Line numbers and explanations
+2. **Code Quality** - Specific improvements needed  
+3. **Pattern Recognition** - Similarities to other project files
+4. **Optimization** - Performance and maintainability suggestions
+
+Use format: "Line X: description of issue/suggestion".`;
+
+      const spinner = ora('Performing advanced code analysis...').start();
+      const response = await askAI(analysisPrompt, options.model, [], false); // Don't use context to avoid duplication
+      spinner.stop();
+      
+      console.log(chalk.blue('🔬 Advanced Code Analysis Results:'));
+      console.log(chalk.white(response));
+      
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
+// AST Architectural Analysis command
+program
+  .command('ast-analyze [file]')
+  .description('Deep architectural analysis using AST parsing')
+  .option('-p, --patterns', 'Focus on architectural patterns')
+  .option('-r, --relationships', 'Show code relationships')
+  .option('-m, --metrics', 'Display code metrics')
+  .action(async (file, options) => {
+    try {
+      const embeddings = new CodeEmbeddings();
+      await embeddings.initialize();
+      
+      if (file) {
+        // Analyze specific file
+        const content = fs.readFileSync(file, 'utf8');
+        const astData = await embeddings.getASTData(file);
+        
+        if (!astData) {
+          console.log(chalk.yellow(`No AST data found for ${file}. Run 'embed-learn' first.`));
+          return;
+        }
+        
+        console.log(chalk.blue(`🌳 AST Analysis: ${file}`));
+        console.log(chalk.white(`Language: ${astData.ast_json.language}`));
+        console.log(chalk.white(`Classes: ${astData.ast_json.classes?.length || 0}`));
+        console.log(chalk.white(`Functions: ${astData.ast_json.functions?.length || 0}`));
+        
+        if (options.patterns && astData.architectural_patterns.length > 0) {
+          console.log(chalk.yellow('\n🏗️  Architectural Patterns:'));
+          astData.architectural_patterns.forEach(pattern => {
+            console.log(`  • ${pattern.pattern} (${(pattern.confidence * 100).toFixed(1)}% confidence)`);
+            console.log(`    Evidence: ${pattern.evidence}`);
+          });
+        }
+        
+        if (options.relationships) {
+          const related = await embeddings.findRelatedFiles(file);
+          console.log(chalk.cyan('\n🔗 Code Relationships:'));
+          related.forEach(rel => {
+            console.log(`  • ${rel.relationship} → ${rel.file} (${(rel.strength * 100).toFixed(1)}%)`);
+          });
+        }
+        
+        if (options.metrics && astData.code_metrics) {
+          console.log(chalk.magenta('\n📊 Code Metrics:'));
+          Object.entries(astData.code_metrics).forEach(([metric, value]) => {
+            console.log(`  • ${metric}: ${typeof value === 'number' ? value.toFixed(2) : value}`);
+          });
+        }
+        
+      } else {
+        // Analyze entire codebase architecture
+        const stats = await embeddings.getCodebaseStats();
+        
+        console.log(chalk.blue('🏛️  Codebase Architecture Overview'));
+        console.log(`Total files: ${stats.totalFiles}`);
+        console.log(`Languages: ${Object.keys(stats.languages).join(', ')}`);
+        
+        // Get all AST data for pattern analysis
+        const allPatterns = await embeddings.getArchitecturalPatterns();
+        
+        if (allPatterns.length > 0) {
+          console.log(chalk.yellow('\n🏗️  Detected Architectural Patterns:'));
+          const patternCounts = {};
+          allPatterns.forEach(pattern => {
+            patternCounts[pattern.pattern] = (patternCounts[pattern.pattern] || 0) + 1;
+          });
+          
+          Object.entries(patternCounts)
+            .sort(([,a], [,b]) => b - a)
+            .forEach(([pattern, count]) => {
+              console.log(`  • ${pattern}: ${count} occurrences`);
+            });
+        }
+        
+        // Show relationship graph
+        const relationships = await embeddings.getRelationshipGraph();
+        if (relationships.length > 0) {
+          console.log(chalk.cyan('\n🕸️  Code Relationship Graph:'));
+          const relTypes = {};
+          relationships.forEach(rel => {
+            relTypes[rel.relationship_type] = (relTypes[rel.relationship_type] || 0) + 1;
+          });
+          
+          Object.entries(relTypes).forEach(([type, count]) => {
+            console.log(`  • ${type}: ${count} connections`);
+          });
+        }
+      }
+      
+      await embeddings.close();
+    } catch (error) {
+      console.log(chalk.red(`❌ Error: ${error.message}`));
+    }
+  });
+
 // Context command
 program
   .command('context')
@@ -926,41 +1279,172 @@ program
     }
   });
 
-// Helper function to get learned context
-function getLearnedContext() {
+// Enhanced helper function to get learned context with smart embeddings
+async function getLearnedContext(query = '', useEmbeddings = true) {
   let context = '';
   
   try {
-    // Get codebase analysis
+    // Get traditional learned context
     const analysisFile = path.join(contextDir, 'codebase-analysis.json');
     if (fs.existsSync(analysisFile)) {
       const analysis = JSON.parse(fs.readFileSync(analysisFile, 'utf8'));
-      context += `\n--- Learned Codebase Context ---\n${analysis.analysis}\n`;
+      context += `\n--- Learned Codebase Patterns ---\n${analysis.analysis}\n`;
     }
     
     // Get custom notes
     const notesFile = path.join(contextDir, 'custom-notes.json');
     if (fs.existsSync(notesFile)) {
       const notes = JSON.parse(fs.readFileSync(notesFile, 'utf8'));
-      const recentNotes = notes.slice(-3).map(n => n.note).join('\n');
-      context += `\n--- Custom Project Notes ---\n${recentNotes}\n`;
+      const recentNotes = notes.slice(-5).map(n => n.note).join('\n');
+      context += `\n--- Project Conventions & Team Notes ---\n${recentNotes}\n`;
     }
+    
+    // Add advanced embedding-based context if available and query provided
+    if (useEmbeddings && query) {
+      try {
+        const embeddings = new CodeEmbeddings();
+        const embeddingDbExists = fs.existsSync(path.join(os.homedir(), '.ai-terminal-embeddings.db'));
+        
+        if (embeddingDbExists) {
+          await embeddings.initialize();
+          
+          // Get codebase stats for better context
+          const stats = await embeddings.getCodebaseStats();
+          if (stats.totalFiles > 0) {
+            context += `\n--- Codebase Intelligence ---\n`;
+            context += `Total files analyzed: ${stats.totalFiles}\n`;
+            context += `Languages: ${Object.keys(stats.languages).join(', ')}\n`;
+            
+            if (stats.patterns && Object.keys(stats.patterns).length > 0) {
+              context += `Common patterns: ${Object.keys(stats.patterns).join(', ')}\n`;
+            }
+          }
+          
+          // Get semantically similar files
+          const queryEmbedding = await embeddings.generateEmbedding(query);
+          const similarFiles = await embeddings.findSimilar(queryEmbedding, 5);
+          
+          if (similarFiles.length > 0) {
+            context += `\n--- Relevant Code Examples ---\n`;
+            for (const file of similarFiles) {
+              if (file.similarity > 0.2) { // Lower threshold for more context
+                context += `\n📁 ${file.filePath} (${(file.similarity * 100).toFixed(1)}% relevant)\n`;
+                context += `   Language: ${file.metadata.language}\n`;
+                
+                if (file.metadata.functions && file.metadata.functions.length > 0) {
+                  context += `   Functions: ${file.metadata.functions.slice(0, 3).join(', ')}\n`;
+                }
+                
+                if (file.metadata.classes && file.metadata.classes.length > 0) {
+                  context += `   Classes: ${file.metadata.classes.map(c => c.name).slice(0, 2).join(', ')}\n`;
+                }
+                
+                if (file.metadata.patterns && file.metadata.patterns.length > 0) {
+                  context += `   Patterns: ${file.metadata.patterns.join(', ')}\n`;
+                }
+                
+                if (file.metadata.complexity) {
+                  context += `   Complexity: ${file.metadata.complexity}\n`;
+                }
+                
+                if (file.metadata.security && file.metadata.security.vulnerabilities.length > 0) {
+                  context += `   Security notes: ${file.metadata.security.vulnerabilities.join(', ')}\n`;
+                }
+              }
+            }
+          }
+          
+          // Find similar patterns based on query
+          const queryWords = query.toLowerCase().split(/\s+/);
+          for (const word of queryWords) {
+            if (word.length > 3) {
+              const patterns = await embeddings.findSimilarPatterns('function', word, 3);
+              if (patterns.length > 0) {
+                context += `\n--- Similar Functions Found ---\n`;
+                patterns.forEach(pattern => {
+                  context += `   ${pattern.content} (used in ${pattern.files.length} files, frequency: ${pattern.frequency})\n`;
+                });
+                break; // Only show patterns for first meaningful word
+              }
+            }
+          }
+          
+          // Add AST-based architectural insights
+          const architecturalPatterns = await embeddings.getArchitecturalPatterns();
+          if (architecturalPatterns.length > 0) {
+            context += `\n--- Architectural Patterns in Codebase ---\n`;
+            const uniquePatterns = [...new Set(architecturalPatterns.map(p => p.pattern))];
+            uniquePatterns.slice(0, 5).forEach(pattern => {
+              const count = architecturalPatterns.filter(p => p.pattern === pattern).length;
+              context += `   ${pattern} pattern detected (${count} occurrences)\n`;
+            });
+          }
+          
+          // Add relevant relationships if analyzing specific files
+          const queryMentionsFile = queryWords.find(word => word.includes('.js') || word.includes('.ts') || word.includes('.py'));
+          if (queryMentionsFile) {
+            try {
+              const related = await embeddings.findRelatedFiles(queryMentionsFile);
+              if (related.length > 0) {
+                context += `\n--- Code Relationships for ${queryMentionsFile} ---\n`;
+                related.slice(0, 3).forEach(rel => {
+                  context += `   ${rel.relationship} → ${rel.file} (${(rel.strength * 100).toFixed(1)}% strength)\n`;
+                });
+              }
+            } catch (error) {
+              // File relationships not available
+            }
+          }
+          
+          await embeddings.close();
+        }
+      } catch (error) {
+        // Silently continue if embeddings fail
+        console.log(chalk.gray('Smart embeddings temporarily unavailable'));
+      }
+    }
+    
+    // Add context usage instructions
+    if (context.trim()) {
+      context += `\n--- Instructions ---\n`;
+      context += `Use the above context to provide project-specific, accurate responses.\n`;
+      context += `Reference specific files, functions, and patterns when relevant.\n`;
+      context += `Follow the project's established conventions and coding style.\n`;
+    }
+    
   } catch {}
   
   return context;
 }
 
 async function askAI(question, model = 'llama3-70b-8192', conversation = [], useContext = true) {
+  // Input validation
+  if (!question || typeof question !== 'string' || question.trim().length === 0) {
+    throw new Error('Question must be a non-empty string');
+  }
+  
   const apiKey = config.get('apiKey');
   const apiUrl = config.get('apiUrl', 'https://api.groq.com/openai/v1');
   
-  let finalQuestion = question;
+  if (!apiKey) {
+    throw new Error('API key not configured. Run: aiterm config');
+  }
   
-  // Add learned context to question if available
+  if (!apiUrl) {
+    throw new Error('API URL not configured. Run: aiterm config');
+  }
+  
+  let finalQuestion = question.trim();
+  
+  // Add learned context to question if available (now with smart embeddings)
   if (useContext) {
-    const context = getLearnedContext();
-    if (context) {
-      finalQuestion = `${context}\n\n--- User Request ---\n${question}`;
+    try {
+      const context = await getLearnedContext(question, true);
+      if (context && context.trim()) {
+        finalQuestion = `${context}\n\n--- User Request ---\n${question}`;
+      }
+    } catch (contextError) {
+      console.log(chalk.yellow('⚠️  Context loading failed, proceeding without context'));
     }
   }
   
@@ -968,19 +1452,64 @@ async function askAI(question, model = 'llama3-70b-8192', conversation = [], use
     { role: 'user', content: finalQuestion }
   ];
 
-  const response = await axios.post(`${apiUrl}/chat/completions`, {
-    model: model,
-    messages: messages,
-    max_tokens: 1000,
-    temperature: 0.7
-  }, {
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    }
-  });
+  // Validate message length to prevent API errors
+  const totalTokens = finalQuestion.length / 4; // Rough estimate
+  if (totalTokens > 8000) {
+    console.log(chalk.yellow('⚠️  Request is very large, truncating context...'));
+    finalQuestion = question; // Fall back to just the question
+  }
 
-  return response.data.choices[0].message.content.trim();
+  try {
+    const response = await axios.post(`${apiUrl}/chat/completions`, {
+      model: model,
+      messages: [{ role: 'user', content: finalQuestion }],
+      max_tokens: Math.min(2000, 16000 - totalTokens), // Dynamic max tokens
+      temperature: 0.1, // Lower temperature for more accurate responses
+      top_p: 0.9
+    }, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000 // 30 second timeout
+    });
+
+    if (!response.data || !response.data.choices || response.data.choices.length === 0) {
+      throw new Error('Invalid response from AI service');
+    }
+
+    const content = response.data.choices[0].message.content;
+    if (!content) {
+      throw new Error('Empty response from AI service');
+    }
+
+    return content.trim();
+    
+  } catch (error) {
+    // Enhanced error handling
+    if (error.response) {
+      const status = error.response.status;
+      const errorData = error.response.data;
+      
+      if (status === 401) {
+        throw new Error('Authentication failed. Check your API key.');
+      } else if (status === 429) {
+        throw new Error('Rate limit exceeded. Please wait and try again.');
+      } else if (status === 413) {
+        throw new Error('Request too large. Try with a shorter query.');
+      } else if (status >= 500) {
+        throw new Error('AI service temporarily unavailable. Please try again later.');
+      } else {
+        throw new Error(`AI service error (${status}): ${errorData?.error?.message || 'Unknown error'}`);
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout. The AI service is taking too long to respond.');
+    } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      throw new Error('Network error. Check your internet connection.');
+    } else {
+      throw new Error(`Request failed: ${error.message}`);
+    }
+  }
 }
 
 if (process.argv.length === 2) {

@@ -1,0 +1,749 @@
+{
+  "timestamp": "2025-08-17T12:59:24.580Z",
+  "summary": {
+    "testsCompleted": 5,
+    "totalTests": 5,
+    "aiTerminalAverage": 35.056,
+    "claudeCodeAverage": 15.919999999999998,
+    "overallImprovement": 120.20100502512562
+  },
+  "categoryBreakdown": {
+    "accuracy": {
+      "aiTerminal": 0,
+      "claudeCode": 0,
+      "improvement": null
+    },
+    "specificity": {
+      "aiTerminal": 15,
+      "claudeCode": 10,
+      "improvement": 50
+    },
+    "contextAwareness": {
+      "aiTerminal": 6,
+      "claudeCode": 2.4,
+      "improvement": 150
+    },
+    "actionability": {
+      "aiTerminal": 4.8,
+      "claudeCode": 0.4,
+      "improvement": 1099.9999999999998
+    },
+    "completeness": {
+      "aiTerminal": 9.256,
+      "claudeCode": 3.12,
+      "improvement": 196.66666666666666
+    }
+  },
+  "individualResults": [
+    {
+      "testCase": {
+        "id": "T1",
+        "name": "Security Vulnerability Detection",
+        "file": "embeddings.js",
+        "prompt": "Analyze this file for security vulnerabilities and provide specific line numbers",
+        "expectedFindings": [
+          "SQL injection in storeEmbedding method",
+          "Parameterized queries recommendation",
+          "Input validation missing",
+          "Error handling improvements"
+        ],
+        "expectedLineNumbers": [
+          "507-515",
+          "568-577",
+          "102-104"
+        ],
+        "weight": "high"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T1",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the code file:\n\n**Security Issues**\n\n* Line 64-75, 79-87, 91-101, 105-114: The code uses SQLite database and creates multiple tables with SQL queries. This is a potential SQL injection risk if the input data is not properly sanitized. It's recommended to use parameterized queries or an ORM library to mitigate this risk.\n* Line 33-39, 46-50: The code uses `eval`-like functionality with `pipeline` function, which can lead to code injection vulnerabilities if not properly validated. It's recommended to use a safer alternative or validate the input data thoroughly.\n\n**Code Quality**\n\n* Line 8-14: The `CodeEmbeddings` class has a complex constructor with multiple dependencies. It's recommended to consider dependency injection or a more modular design to improve maintainability.\n* Line 16-28: The `initialize` method has a complex try-catch block with multiple error handling scenarios. It's recommended to consider a more structured approach to error handling, such as using a separate error handling function or a more robust error handling mechanism.\n* Line 31-56: The `initializeEmbeddingModel` method has a complex logic with multiple try-catch blocks. It's recommended to consider breaking down the method into smaller, more manageable functions to improve readability and maintainability.\n* Line 126-142: The `generateEmbedding` method has a complex logic with multiple conditional statements. It's recommended to consider breaking down the method into smaller, more manageable functions to improve readability and maintainability.\n\n**Pattern Recognition**\n\n* The code has similarities with other project files, such as `api-comparison-test.js` and `ast-analyzer.js`, which suggests a consistent coding style and architecture across the project.\n* The code uses a similar pattern of creating a class with an `initialize` method, which suggests a consistent approach to initialization and setup across the project.\n\n**Optimization**\n\n* Line 10-13: The code uses multiple `require` statements to import dependencies. It's recommended to consider using a single `require` statement with an object destructuring to improve performance and readability.\n* Line 16-28: The `initialize` method has a complex try-catch block with multiple error handling scenarios. It's recommended to consider using a more efficient error handling mechanism, such as using a separate error handling function or a more robust error handling mechanism.\n* Line 31-56: The `initializeEmbeddingModel` method has a complex logic with multiple try-catch blocks. It's recommended to consider using a more efficient approach to model initialization, such as using a caching mechanism or a more robust model loading mechanism.\n* Line 126-142: The `generateEmbedding` method has a complex logic with multiple conditional statements. It's recommended to consider using a more efficient approach to embedding generation, such as using a caching mechanism or a more robust embedding generation mechanism.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2451,
+        "timestamp": "2025-08-17T12:59:19.017Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 12,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 60,
+          "percentage": 60,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 10,
+            "contextMentions": 4,
+            "actionMentions": 4,
+            "wordCount": 460
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T1",
+        "response": "Security Issues Found:\n- Line 507-515: SQL injection risk in storeEmbedding() method due to string concatenation\n- Line 568-577: INSERT OR REPLACE query should use parameterized statements  \n- Line 102-104: Model initialization lacks input validation\n- Missing: Input sanitization for file paths and content",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:19.019Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 0,
+          "actionability": 2,
+          "completeness": 2.88,
+          "total": 29.88,
+          "percentage": 29.880000000000003,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 3,
+            "contextMentions": 0,
+            "actionMentions": 1,
+            "wordCount": 44
+          }
+        }
+      },
+      "improvement": 100.80321285140563
+    },
+    {
+      "testCase": {
+        "id": "T2",
+        "name": "Architectural Pattern Recognition",
+        "file": "index.js",
+        "prompt": "Identify architectural patterns and design principles used in this codebase",
+        "expectedFindings": [
+          "Command pattern (CLI commands)",
+          "Factory pattern (embedding creation)",
+          "Strategy pattern (multiple AI models)",
+          "Singleton pattern (config management)"
+        ],
+        "expectedReferences": [
+          "program.command",
+          "embeddings initialization",
+          "model selection"
+        ],
+        "weight": "high"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T2",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the code file:\n\n**Security Issues**\n\n* Line 17: The `fs.readFileSync` function is used to read the configuration file, which can lead to a denial-of-service (DoS) attack if an attacker can manipulate the file size or contents. Consider using `fs.promises.readFile` instead.\n* Line 29: The `fs.writeFileSync` function is used to write to the configuration file, which can lead to a privilege escalation attack if an attacker can manipulate the file contents. Consider using `fs.promises.writeFile` instead.\n* Line 67: The `apiKey` is stored in plaintext in the configuration file, which is a security risk. Consider using a secure storage mechanism, such as an encrypted file or a secrets manager.\n\n**Code Quality**\n\n* Line 14-31: The `config` object is defined with `get` and `set` methods, but it would be better to use a separate module or class for configuration management to keep the code organized and reusable.\n* Line 45-91: The `config` command is implemented using a complex series of `readline` prompts, which can be difficult to maintain and test. Consider breaking it down into smaller functions or using a more robust input validation library.\n* Line 93-117: The `ask` command is implemented using a similar pattern to the `config` command, which can lead to code duplication. Consider extracting a reusable function or class for handling user input and API requests.\n\n**Pattern Recognition**\n\n* The code has a similar structure and style to the `api-comparison-test.js` and `real-benchmark.js` files, which suggests that it may be part of a larger project or framework.\n* The use of `chalk` and `ora` libraries for console output and spinner management is a common pattern in Node.js applications.\n\n**Optimization**\n\n* Line 105-115: The `askAI` function is called with a `try`-`catch` block, which can lead to performance issues if the function throws an error. Consider using a more robust error handling mechanism, such as a centralized error handler or a promise-based approach.\n* Line 131-150: The `chat` command is implemented using a complex series of `readline` prompts, which can lead to performance issues if the user input is slow or malformed. Consider using a more robust input validation library or a WebSockets-based approach for real-time communication.\n* The code uses several synchronous file I/O operations, which can lead to performance issues if the file system is slow or congested. Consider using asynchronous file I/O operations or caching mechanisms to improve performance.\n\nOverall, the code appears to be well-structured and maintainable, but there are some security and performance issues that need to be addressed. Additionally, there are opportunities for code refactoring and optimization to improve the overall quality and reliability of the application.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2323,
+        "timestamp": "2025-08-17T12:59:21.343Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 9,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 57,
+          "percentage": 56.99999999999999,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 8,
+            "contextMentions": 3,
+            "actionMentions": 4,
+            "wordCount": 464
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T2",
+        "response": "Architectural Patterns Identified:\n- Command Pattern: CLI commands using commander library (index.js:35-1394)\n- Factory Pattern: CodeEmbeddings instantiation with fallback models\n- Module Pattern: Separate files for distinct functionality\n- Observer Pattern: Event-driven async operations throughout",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:21.343Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 2.7,
+          "total": 5.7,
+          "percentage": 5.7,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 35
+          }
+        }
+      },
+      "improvement": 900
+    },
+    {
+      "testCase": {
+        "id": "T3",
+        "name": "Code Quality Assessment",
+        "file": "ast-analyzer.js",
+        "prompt": "Review this code for quality issues and suggest specific improvements",
+        "expectedFindings": [
+          "Large class with many responsibilities",
+          "Complex regular expressions",
+          "Missing error handling",
+          "Code duplication in parsing methods"
+        ],
+        "expectedLineNumbers": [
+          "91-120",
+          "116-140",
+          "650+"
+        ],
+        "weight": "medium"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T3",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the provided code file:\n\n**Security Issues**\n\n* Line 32: The error message `Unsupported file type: ${path.extname(filePath)}` may leak information about the system's file structure. Consider using a more generic error message.\n* Line 91: The regular expression `classRegex` is not validated for malicious input. This could lead to a ReDoS (Regular Expression Denial of Service) attack if an attacker provides a specially crafted input.\n* Line 117: Similarly, the regular expression `functionRegex` is not validated for malicious input, which could lead to a ReDoS attack.\n\n**Code Quality**\n\n* Line 10: The `ASTAnalyzer` class has a large number of methods and properties. Consider breaking it down into smaller, more focused classes to improve maintainability.\n* Line 29: The `analyzeFile` method is quite long and complex. Consider breaking it down into smaller methods, each responsible for a specific task.\n* Line 73: The `analyzeJavaScript` method is also quite long and complex. Consider breaking it down into smaller methods, each responsible for a specific task.\n* Line 92: The regular expression `classRegex` is quite complex and may be difficult to maintain. Consider breaking it down into smaller, more focused regular expressions.\n* Line 116: The regular expression `functionRegex` is also quite complex and may be difficult to maintain. Consider breaking it down into smaller, more focused regular expressions.\n\n**Pattern Recognition**\n\n* The code appears to be similar to other project files, specifically `api-comparison-test.js`. This suggests that the code may be part of a larger project or framework.\n* The use of regular expressions to parse code is reminiscent of other code analysis tools, such as ESLint or TypeScript.\n\n**Optimization**\n\n* Line 35: The `getContentHash` method is not shown in the provided code. Consider using a more efficient hashing algorithm, such as `crypto.createHash('sha256')`.\n* Line 65: The `astCache` is not cleared or updated when the `analyzeFile` method is called. Consider implementing a cache invalidation mechanism to ensure that the cache remains up-to-date.\n* Line 92: The regular expression `classRegex` is executed multiple times on the same input. Consider using a more efficient approach, such as using a parser generator like ANTLR or a dedicated JavaScript parser like Esprima.\n* Line 117: Similarly, the regular expression `functionRegex` is executed multiple times on the same input. Consider using a more efficient approach, such as using a parser generator like ANTLR or a dedicated JavaScript parser like Esprima.\n\nOverall, the code appears to be well-structured and maintainable, but may benefit from some security and performance optimizations.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2183,
+        "timestamp": "2025-08-17T12:59:23.527Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 9,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 57,
+          "percentage": 56.99999999999999,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 12,
+            "contextMentions": 3,
+            "actionMentions": 4,
+            "wordCount": 441
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T3",
+        "response": "Code Quality Issues:\n- Large class: ASTAnalyzer has too many responsibilities (~1100 lines)\n- Complex regex: Multiple complex patterns (lines 91-120, 116-140)  \n- Error handling: Inconsistent try-catch usage\n- Method length: Several methods exceed 50 lines",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:23.528Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 10,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 4.72,
+          "total": 17.72,
+          "percentage": 17.72,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 36
+          }
+        }
+      },
+      "improvement": 221.67042889390524
+    },
+    {
+      "testCase": {
+        "id": "T4",
+        "name": "Cross-File Relationship Analysis",
+        "file": "embeddings.js",
+        "prompt": "Analyze how this file relates to other files in the codebase and show dependencies",
+        "expectedFindings": [
+          "Imports ASTAnalyzer",
+          "Used by index.js commands",
+          "Extends base functionality",
+          "Database schema relationships"
+        ],
+        "expectedReferences": [
+          "ast-analyzer.js",
+          "index.js",
+          "sqlite3"
+        ],
+        "weight": "medium"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T4",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n❌ Error: Rate limit exceeded. Please wait and try again.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 541,
+        "timestamp": "2025-08-17T12:59:24.069Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 0,
+          "actionability": 0,
+          "completeness": 0.64,
+          "total": 0.64,
+          "percentage": 0.64,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 0,
+            "actionMentions": 0,
+            "wordCount": 32
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T4",
+        "response": "File Relationships:\n- Direct import: ast-analyzer.js (line 6)\n- Used by: index.js commands (embed-learn, ast-analyze)\n- Database dependency: sqlite3 for storage\n- Extends: Base embedding functionality with AST features",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:24.069Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 5,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 0.58,
+          "total": 8.58,
+          "percentage": 8.58,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 1,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 29
+          }
+        }
+      },
+      "improvement": -92.54079254079255
+    },
+    {
+      "testCase": {
+        "id": "T5",
+        "name": "Performance Optimization",
+        "file": "index.js",
+        "prompt": "Identify performance bottlenecks and suggest optimizations with specific locations",
+        "expectedFindings": [
+          "Large file processing in embed-learn",
+          "Synchronous file operations",
+          "Memory usage in similarity search",
+          "Database query optimization"
+        ],
+        "expectedLineNumbers": [
+          "830-846",
+          "1157-1189"
+        ],
+        "weight": "low"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T5",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n❌ Error: Rate limit exceeded. Please wait and try again.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 510,
+        "timestamp": "2025-08-17T12:59:24.579Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 0,
+          "actionability": 0,
+          "completeness": 0.64,
+          "total": 0.64,
+          "percentage": 0.64,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 0,
+            "actionMentions": 0,
+            "wordCount": 32
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T5",
+        "response": "Performance Bottlenecks:\n- File processing: Synchronous reads in embed-learn loop (lines 830-846)\n- Memory usage: Large AST objects stored in memory\n- Database queries: Multiple sequential inserts without batching\n- Regex execution: Complex patterns run repeatedly",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:24.580Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 10,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 4.72,
+          "total": 17.72,
+          "percentage": 17.72,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 36
+          }
+        }
+      },
+      "improvement": -96.3882618510158
+    }
+  ],
+  "rawResults": [
+    {
+      "testCase": {
+        "id": "T1",
+        "name": "Security Vulnerability Detection",
+        "file": "embeddings.js",
+        "prompt": "Analyze this file for security vulnerabilities and provide specific line numbers",
+        "expectedFindings": [
+          "SQL injection in storeEmbedding method",
+          "Parameterized queries recommendation",
+          "Input validation missing",
+          "Error handling improvements"
+        ],
+        "expectedLineNumbers": [
+          "507-515",
+          "568-577",
+          "102-104"
+        ],
+        "weight": "high"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T1",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the code file:\n\n**Security Issues**\n\n* Line 64-75, 79-87, 91-101, 105-114: The code uses SQLite database and creates multiple tables with SQL queries. This is a potential SQL injection risk if the input data is not properly sanitized. It's recommended to use parameterized queries or an ORM library to mitigate this risk.\n* Line 33-39, 46-50: The code uses `eval`-like functionality with `pipeline` function, which can lead to code injection vulnerabilities if not properly validated. It's recommended to use a safer alternative or validate the input data thoroughly.\n\n**Code Quality**\n\n* Line 8-14: The `CodeEmbeddings` class has a complex constructor with multiple dependencies. It's recommended to consider dependency injection or a more modular design to improve maintainability.\n* Line 16-28: The `initialize` method has a complex try-catch block with multiple error handling scenarios. It's recommended to consider a more structured approach to error handling, such as using a separate error handling function or a more robust error handling mechanism.\n* Line 31-56: The `initializeEmbeddingModel` method has a complex logic with multiple try-catch blocks. It's recommended to consider breaking down the method into smaller, more manageable functions to improve readability and maintainability.\n* Line 126-142: The `generateEmbedding` method has a complex logic with multiple conditional statements. It's recommended to consider breaking down the method into smaller, more manageable functions to improve readability and maintainability.\n\n**Pattern Recognition**\n\n* The code has similarities with other project files, such as `api-comparison-test.js` and `ast-analyzer.js`, which suggests a consistent coding style and architecture across the project.\n* The code uses a similar pattern of creating a class with an `initialize` method, which suggests a consistent approach to initialization and setup across the project.\n\n**Optimization**\n\n* Line 10-13: The code uses multiple `require` statements to import dependencies. It's recommended to consider using a single `require` statement with an object destructuring to improve performance and readability.\n* Line 16-28: The `initialize` method has a complex try-catch block with multiple error handling scenarios. It's recommended to consider using a more efficient error handling mechanism, such as using a separate error handling function or a more robust error handling mechanism.\n* Line 31-56: The `initializeEmbeddingModel` method has a complex logic with multiple try-catch blocks. It's recommended to consider using a more efficient approach to model initialization, such as using a caching mechanism or a more robust model loading mechanism.\n* Line 126-142: The `generateEmbedding` method has a complex logic with multiple conditional statements. It's recommended to consider using a more efficient approach to embedding generation, such as using a caching mechanism or a more robust embedding generation mechanism.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2451,
+        "timestamp": "2025-08-17T12:59:19.017Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 12,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 60,
+          "percentage": 60,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 10,
+            "contextMentions": 4,
+            "actionMentions": 4,
+            "wordCount": 460
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T1",
+        "response": "Security Issues Found:\n- Line 507-515: SQL injection risk in storeEmbedding() method due to string concatenation\n- Line 568-577: INSERT OR REPLACE query should use parameterized statements  \n- Line 102-104: Model initialization lacks input validation\n- Missing: Input sanitization for file paths and content",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:19.019Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 0,
+          "actionability": 2,
+          "completeness": 2.88,
+          "total": 29.88,
+          "percentage": 29.880000000000003,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 3,
+            "contextMentions": 0,
+            "actionMentions": 1,
+            "wordCount": 44
+          }
+        }
+      },
+      "improvement": 100.80321285140563
+    },
+    {
+      "testCase": {
+        "id": "T2",
+        "name": "Architectural Pattern Recognition",
+        "file": "index.js",
+        "prompt": "Identify architectural patterns and design principles used in this codebase",
+        "expectedFindings": [
+          "Command pattern (CLI commands)",
+          "Factory pattern (embedding creation)",
+          "Strategy pattern (multiple AI models)",
+          "Singleton pattern (config management)"
+        ],
+        "expectedReferences": [
+          "program.command",
+          "embeddings initialization",
+          "model selection"
+        ],
+        "weight": "high"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T2",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the code file:\n\n**Security Issues**\n\n* Line 17: The `fs.readFileSync` function is used to read the configuration file, which can lead to a denial-of-service (DoS) attack if an attacker can manipulate the file size or contents. Consider using `fs.promises.readFile` instead.\n* Line 29: The `fs.writeFileSync` function is used to write to the configuration file, which can lead to a privilege escalation attack if an attacker can manipulate the file contents. Consider using `fs.promises.writeFile` instead.\n* Line 67: The `apiKey` is stored in plaintext in the configuration file, which is a security risk. Consider using a secure storage mechanism, such as an encrypted file or a secrets manager.\n\n**Code Quality**\n\n* Line 14-31: The `config` object is defined with `get` and `set` methods, but it would be better to use a separate module or class for configuration management to keep the code organized and reusable.\n* Line 45-91: The `config` command is implemented using a complex series of `readline` prompts, which can be difficult to maintain and test. Consider breaking it down into smaller functions or using a more robust input validation library.\n* Line 93-117: The `ask` command is implemented using a similar pattern to the `config` command, which can lead to code duplication. Consider extracting a reusable function or class for handling user input and API requests.\n\n**Pattern Recognition**\n\n* The code has a similar structure and style to the `api-comparison-test.js` and `real-benchmark.js` files, which suggests that it may be part of a larger project or framework.\n* The use of `chalk` and `ora` libraries for console output and spinner management is a common pattern in Node.js applications.\n\n**Optimization**\n\n* Line 105-115: The `askAI` function is called with a `try`-`catch` block, which can lead to performance issues if the function throws an error. Consider using a more robust error handling mechanism, such as a centralized error handler or a promise-based approach.\n* Line 131-150: The `chat` command is implemented using a complex series of `readline` prompts, which can lead to performance issues if the user input is slow or malformed. Consider using a more robust input validation library or a WebSockets-based approach for real-time communication.\n* The code uses several synchronous file I/O operations, which can lead to performance issues if the file system is slow or congested. Consider using asynchronous file I/O operations or caching mechanisms to improve performance.\n\nOverall, the code appears to be well-structured and maintainable, but there are some security and performance issues that need to be addressed. Additionally, there are opportunities for code refactoring and optimization to improve the overall quality and reliability of the application.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2323,
+        "timestamp": "2025-08-17T12:59:21.343Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 9,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 57,
+          "percentage": 56.99999999999999,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 8,
+            "contextMentions": 3,
+            "actionMentions": 4,
+            "wordCount": 464
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T2",
+        "response": "Architectural Patterns Identified:\n- Command Pattern: CLI commands using commander library (index.js:35-1394)\n- Factory Pattern: CodeEmbeddings instantiation with fallback models\n- Module Pattern: Separate files for distinct functionality\n- Observer Pattern: Event-driven async operations throughout",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:21.343Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 2.7,
+          "total": 5.7,
+          "percentage": 5.7,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 35
+          }
+        }
+      },
+      "improvement": 900
+    },
+    {
+      "testCase": {
+        "id": "T3",
+        "name": "Code Quality Assessment",
+        "file": "ast-analyzer.js",
+        "prompt": "Review this code for quality issues and suggest specific improvements",
+        "expectedFindings": [
+          "Large class with many responsibilities",
+          "Complex regular expressions",
+          "Missing error handling",
+          "Code duplication in parsing methods"
+        ],
+        "expectedLineNumbers": [
+          "91-120",
+          "116-140",
+          "650+"
+        ],
+        "weight": "medium"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T3",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n🔬 Advanced Code Analysis Results:\nHere is the analysis of the provided code file:\n\n**Security Issues**\n\n* Line 32: The error message `Unsupported file type: ${path.extname(filePath)}` may leak information about the system's file structure. Consider using a more generic error message.\n* Line 91: The regular expression `classRegex` is not validated for malicious input. This could lead to a ReDoS (Regular Expression Denial of Service) attack if an attacker provides a specially crafted input.\n* Line 117: Similarly, the regular expression `functionRegex` is not validated for malicious input, which could lead to a ReDoS attack.\n\n**Code Quality**\n\n* Line 10: The `ASTAnalyzer` class has a large number of methods and properties. Consider breaking it down into smaller, more focused classes to improve maintainability.\n* Line 29: The `analyzeFile` method is quite long and complex. Consider breaking it down into smaller methods, each responsible for a specific task.\n* Line 73: The `analyzeJavaScript` method is also quite long and complex. Consider breaking it down into smaller methods, each responsible for a specific task.\n* Line 92: The regular expression `classRegex` is quite complex and may be difficult to maintain. Consider breaking it down into smaller, more focused regular expressions.\n* Line 116: The regular expression `functionRegex` is also quite complex and may be difficult to maintain. Consider breaking it down into smaller, more focused regular expressions.\n\n**Pattern Recognition**\n\n* The code appears to be similar to other project files, specifically `api-comparison-test.js`. This suggests that the code may be part of a larger project or framework.\n* The use of regular expressions to parse code is reminiscent of other code analysis tools, such as ESLint or TypeScript.\n\n**Optimization**\n\n* Line 35: The `getContentHash` method is not shown in the provided code. Consider using a more efficient hashing algorithm, such as `crypto.createHash('sha256')`.\n* Line 65: The `astCache` is not cleared or updated when the `analyzeFile` method is called. Consider implementing a cache invalidation mechanism to ensure that the cache remains up-to-date.\n* Line 92: The regular expression `classRegex` is executed multiple times on the same input. Consider using a more efficient approach, such as using a parser generator like ANTLR or a dedicated JavaScript parser like Esprima.\n* Line 117: Similarly, the regular expression `functionRegex` is executed multiple times on the same input. Consider using a more efficient approach, such as using a parser generator like ANTLR or a dedicated JavaScript parser like Esprima.\n\nOverall, the code appears to be well-structured and maintainable, but may benefit from some security and performance optimizations.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 2183,
+        "timestamp": "2025-08-17T12:59:23.527Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 25,
+          "contextAwareness": 9,
+          "actionability": 8,
+          "completeness": 15,
+          "total": 57,
+          "percentage": 56.99999999999999,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 12,
+            "contextMentions": 3,
+            "actionMentions": 4,
+            "wordCount": 441
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T3",
+        "response": "Code Quality Issues:\n- Large class: ASTAnalyzer has too many responsibilities (~1100 lines)\n- Complex regex: Multiple complex patterns (lines 91-120, 116-140)  \n- Error handling: Inconsistent try-catch usage\n- Method length: Several methods exceed 50 lines",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:23.528Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 10,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 4.72,
+          "total": 17.72,
+          "percentage": 17.72,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 36
+          }
+        }
+      },
+      "improvement": 221.67042889390524
+    },
+    {
+      "testCase": {
+        "id": "T4",
+        "name": "Cross-File Relationship Analysis",
+        "file": "embeddings.js",
+        "prompt": "Analyze how this file relates to other files in the codebase and show dependencies",
+        "expectedFindings": [
+          "Imports ASTAnalyzer",
+          "Used by index.js commands",
+          "Extends base functionality",
+          "Database schema relationships"
+        ],
+        "expectedReferences": [
+          "ast-analyzer.js",
+          "index.js",
+          "sqlite3"
+        ],
+        "weight": "medium"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T4",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n❌ Error: Rate limit exceeded. Please wait and try again.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 541,
+        "timestamp": "2025-08-17T12:59:24.069Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 0,
+          "actionability": 0,
+          "completeness": 0.64,
+          "total": 0.64,
+          "percentage": 0.64,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 0,
+            "actionMentions": 0,
+            "wordCount": 32
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T4",
+        "response": "File Relationships:\n- Direct import: ast-analyzer.js (line 6)\n- Used by: index.js commands (embed-learn, ast-analyze)\n- Database dependency: sqlite3 for storage\n- Extends: Base embedding functionality with AST features",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:24.069Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 5,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 0.58,
+          "total": 8.58,
+          "percentage": 8.58,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 1,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 29
+          }
+        }
+      },
+      "improvement": -92.54079254079255
+    },
+    {
+      "testCase": {
+        "id": "T5",
+        "name": "Performance Optimization",
+        "file": "index.js",
+        "prompt": "Identify performance bottlenecks and suggest optimizations with specific locations",
+        "expectedFindings": [
+          "Large file processing in embed-learn",
+          "Synchronous file operations",
+          "Memory usage in similarity search",
+          "Database query optimization"
+        ],
+        "expectedLineNumbers": [
+          "830-846",
+          "1157-1189"
+        ],
+        "weight": "low"
+      },
+      "aiTerminal": {
+        "tool": "ai-terminal",
+        "testId": "T5",
+        "response": "Initializing advanced embedding system...\nCodeT5 unavailable, trying alternative models...\n⚠️  Advanced embeddings unavailable, using fallback system\n✅ Custom embedding system ready\n❌ Error: Rate limit exceeded. Please wait and try again.\n",
+        "error": "- Performing advanced code analysis...\n",
+        "responseTime": 510,
+        "timestamp": "2025-08-17T12:59:24.579Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 0,
+          "contextAwareness": 0,
+          "actionability": 0,
+          "completeness": 0.64,
+          "total": 0.64,
+          "percentage": 0.64,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 0,
+            "actionMentions": 0,
+            "wordCount": 32
+          }
+        }
+      },
+      "claudeCode": {
+        "tool": "claude-code",
+        "testId": "T5",
+        "response": "Performance Bottlenecks:\n- File processing: Synchronous reads in embed-learn loop (lines 830-846)\n- Memory usage: Large AST objects stored in memory\n- Database queries: Multiple sequential inserts without batching\n- Regex execution: Complex patterns run repeatedly",
+        "error": null,
+        "responseTime": 2500,
+        "timestamp": "2025-08-17T12:59:24.580Z",
+        "score": {
+          "accuracy": 0,
+          "specificity": 10,
+          "contextAwareness": 3,
+          "actionability": 0,
+          "completeness": 4.72,
+          "total": 17.72,
+          "percentage": 17.72,
+          "breakdown": {
+            "expectedFindings": 4,
+            "findingsFound": 0,
+            "lineNumbersFound": 0,
+            "contextMentions": 1,
+            "actionMentions": 0,
+            "wordCount": 36
+          }
+        }
+      },
+      "improvement": -96.3882618510158
+    }
+  ]
+}
