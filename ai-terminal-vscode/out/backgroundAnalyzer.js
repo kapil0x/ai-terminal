@@ -114,6 +114,15 @@ class BackgroundAnalyzer {
     async findCodeFiles(directory) {
         const files = [];
         const extensions = new Set(['.js', '.ts', '.tsx', '.jsx', '.py', '.java', '.cpp', '.c', '.go', '.rs']);
+        // Also scan parent directory if we're in ai-terminal-vscode subdirectory
+        const directoriesToScan = [directory];
+        this.outputChannel.appendLine(`📁 Primary directory: ${directory}`);
+        this.outputChannel.appendLine(`📁 Directory basename: ${path.basename(directory)}`);
+        if (path.basename(directory) === 'ai-terminal-vscode') {
+            const parentDir = path.resolve(directory, '..');
+            directoriesToScan.push(parentDir);
+            this.outputChannel.appendLine(`📁 Also scanning parent directory: ${parentDir}`);
+        }
         const scanDirectory = (dir) => {
             try {
                 const items = fs.readdirSync(dir);
@@ -139,7 +148,15 @@ class BackgroundAnalyzer {
                 // Skip directories that can't be read
             }
         };
-        scanDirectory(directory);
+        // Scan all directories
+        directoriesToScan.forEach(dir => {
+            this.outputChannel.appendLine(`🔍 Scanning directory: ${dir}`);
+            scanDirectory(dir);
+        });
+        this.outputChannel.appendLine(`📋 Found ${files.length} total files`);
+        files.forEach(file => {
+            this.outputChannel.appendLine(`   - ${file}`);
+        });
         return files.slice(0, 200); // Limit to 200 files for initial version
     }
     async analyzeFile(filePath, content) {
@@ -189,15 +206,106 @@ class BackgroundAnalyzer {
     }
     async getArchitecturalPatterns() {
         if (!this.isInitialized || !this.aiTerminalCore) {
-            return [];
+            // Fallback: analyze our own cache directly
+            return this.detectPatternsFromCache();
         }
         try {
-            return await this.aiTerminalCore.getArchitecturalPatterns();
+            const patterns = await this.aiTerminalCore.getArchitecturalPatterns();
+            // If embedded analyzer returns empty, try our own cache
+            if (patterns.length === 0) {
+                return this.detectPatternsFromCache();
+            }
+            return patterns;
         }
         catch (error) {
             this.outputChannel.appendLine(`Pattern retrieval error: ${error}`);
+            return this.detectPatternsFromCache();
+        }
+    }
+    detectPatternsFromCache() {
+        const patterns = [];
+        const allAnalyses = Array.from(this.analysisCache.values());
+        this.outputChannel.appendLine(`🔍 Analyzing ${allAnalyses.length} cached files for patterns...`);
+        if (allAnalyses.length === 0) {
             return [];
         }
+        // Count pattern occurrences across all files
+        let classCount = 0;
+        let factoryCount = 0;
+        let singletonCount = 0;
+        let moduleCount = 0;
+        let observerCount = 0;
+        let asyncCount = 0;
+        allAnalyses.forEach((analysis) => {
+            this.outputChannel.appendLine(`📄 Analyzing file: ${analysis.filePath || 'unknown'}`);
+            this.outputChannel.appendLine(`   Metadata: ${analysis.metadata ? 'exists' : 'missing'}`);
+            if (analysis.metadata) {
+                this.outputChannel.appendLine(`   Classes: ${analysis.metadata.classes?.length || 0}`);
+                this.outputChannel.appendLine(`   Functions: ${analysis.metadata.functions?.length || 0}`);
+                this.outputChannel.appendLine(`   Imports: ${analysis.metadata.imports?.length || 0}`);
+                classCount += analysis.metadata.classes?.length || 0;
+                // Detect Factory pattern
+                const factoryClasses = analysis.metadata.classes?.filter((cls) => cls.name.includes('Factory') || cls.name.includes('Creator')) || [];
+                factoryCount += factoryClasses.length;
+                // Detect Singleton pattern
+                const singletonMethods = analysis.metadata.functions?.filter((fn) => fn.includes('getInstance') || fn.includes('instance')) || [];
+                singletonCount += singletonMethods.length;
+                // Detect Module pattern
+                moduleCount += analysis.metadata.imports?.length || 0;
+                // Detect Observer pattern
+                const observerMethods = analysis.metadata.functions?.filter((fn) => fn.includes('addEventListener') || fn.includes('on') || fn.includes('emit')) || [];
+                observerCount += observerMethods.length;
+                // Detect Async pattern
+                const asyncMethods = analysis.metadata.functions?.filter((fn) => fn.includes('async') || fn.includes('await')) || [];
+                asyncCount += asyncMethods.length;
+            }
+        });
+        this.outputChannel.appendLine(`📊 Pattern analysis: classes=${classCount}, factory=${factoryCount}, singleton=${singletonCount}, modules=${moduleCount}, observer=${observerCount}, async=${asyncCount}`);
+        // Add patterns based on actual detection
+        if (factoryCount > 0) {
+            patterns.push({
+                pattern: 'Factory Pattern',
+                confidence: Math.min(0.9, factoryCount / allAnalyses.length),
+                evidence: `${factoryCount} factory classes detected`
+            });
+        }
+        if (singletonCount > 0) {
+            patterns.push({
+                pattern: 'Singleton Pattern',
+                confidence: Math.min(0.9, singletonCount / allAnalyses.length),
+                evidence: `${singletonCount} getInstance methods detected`
+            });
+        }
+        if (moduleCount > allAnalyses.length) {
+            patterns.push({
+                pattern: 'Module Pattern',
+                confidence: 0.8,
+                evidence: `${moduleCount} imports across ${allAnalyses.length} files`
+            });
+        }
+        if (observerCount > 0) {
+            patterns.push({
+                pattern: 'Observer Pattern',
+                confidence: Math.min(0.9, observerCount / allAnalyses.length),
+                evidence: `${observerCount} event listener methods detected`
+            });
+        }
+        if (asyncCount > allAnalyses.length * 0.3) {
+            patterns.push({
+                pattern: 'Async Pattern',
+                confidence: 0.7,
+                evidence: `Heavy async/await usage (${asyncCount} methods)`
+            });
+        }
+        if (classCount > allAnalyses.length * 0.5) {
+            patterns.push({
+                pattern: 'Object-Oriented Architecture',
+                confidence: 0.8,
+                evidence: `${classCount} classes across ${allAnalyses.length} files`
+            });
+        }
+        this.outputChannel.appendLine(`✅ Found ${patterns.length} architectural patterns`);
+        return patterns.slice(0, 6); // Limit to 6 most relevant patterns
     }
     async rebuildEmbeddings() {
         this.analysisCache.clear();
@@ -279,10 +387,85 @@ class EmbeddedAITerminal {
         }));
     }
     async getArchitecturalPatterns() {
-        return [
-            { pattern: 'Module Pattern', confidence: 0.8 },
-            { pattern: 'Factory Pattern', confidence: 0.6 }
-        ];
+        // For embedded AI Terminal, always use real pattern detection
+        return this.detectRealArchitecturalPatterns();
+    }
+    detectRealArchitecturalPatterns() {
+        const patterns = [];
+        const allAnalyses = Array.from(this.cache.values());
+        if (allAnalyses.length === 0) {
+            return []; // No patterns detected yet
+        }
+        // Count pattern occurrences across all files
+        let classCount = 0;
+        let factoryCount = 0;
+        let singletonCount = 0;
+        let moduleCount = 0;
+        let observerCount = 0;
+        let asyncCount = 0;
+        allAnalyses.forEach((analysis) => {
+            if (analysis.metadata) {
+                classCount += analysis.metadata.classes?.length || 0;
+                // Detect Factory pattern
+                const factoryClasses = analysis.metadata.classes?.filter((cls) => cls.name.includes('Factory') || cls.name.includes('Creator')) || [];
+                factoryCount += factoryClasses.length;
+                // Detect Singleton pattern
+                const singletonMethods = analysis.metadata.functions?.filter((fn) => fn.includes('getInstance') || fn.includes('instance')) || [];
+                singletonCount += singletonMethods.length;
+                // Detect Module pattern
+                moduleCount += analysis.metadata.imports?.length || 0;
+                // Detect Observer pattern
+                const observerMethods = analysis.metadata.functions?.filter((fn) => fn.includes('addEventListener') || fn.includes('on') || fn.includes('emit')) || [];
+                observerCount += observerMethods.length;
+                // Detect Async pattern
+                const asyncMethods = analysis.metadata.functions?.filter((fn) => fn.includes('async') || fn.includes('await')) || [];
+                asyncCount += asyncMethods.length;
+            }
+        });
+        // Add patterns based on actual detection
+        if (factoryCount > 0) {
+            patterns.push({
+                pattern: 'Factory Pattern',
+                confidence: Math.min(0.9, factoryCount / allAnalyses.length),
+                evidence: `${factoryCount} factory classes detected`
+            });
+        }
+        if (singletonCount > 0) {
+            patterns.push({
+                pattern: 'Singleton Pattern',
+                confidence: Math.min(0.9, singletonCount / allAnalyses.length),
+                evidence: `${singletonCount} getInstance methods detected`
+            });
+        }
+        if (moduleCount > allAnalyses.length) {
+            patterns.push({
+                pattern: 'Module Pattern',
+                confidence: 0.8,
+                evidence: `${moduleCount} imports across ${allAnalyses.length} files`
+            });
+        }
+        if (observerCount > 0) {
+            patterns.push({
+                pattern: 'Observer Pattern',
+                confidence: Math.min(0.9, observerCount / allAnalyses.length),
+                evidence: `${observerCount} event listener methods detected`
+            });
+        }
+        if (asyncCount > allAnalyses.length * 0.3) {
+            patterns.push({
+                pattern: 'Async Pattern',
+                confidence: 0.7,
+                evidence: `Heavy async/await usage (${asyncCount} methods)`
+            });
+        }
+        if (classCount > allAnalyses.length * 0.5) {
+            patterns.push({
+                pattern: 'Object-Oriented Architecture',
+                confidence: 0.8,
+                evidence: `${classCount} classes across ${allAnalyses.length} files`
+            });
+        }
+        return patterns.slice(0, 6); // Limit to 6 most relevant patterns
     }
     extractBasicMetadata(filePath, content) {
         const language = this.detectLanguage(filePath);
@@ -320,9 +503,14 @@ class EmbeddedAITerminal {
     extractFunctions(content) {
         const functions = [];
         const patterns = [
-            /function\\s+(\\w+)/g,
-            /const\\s+(\\w+)\\s*=\\s*(?:async\\s*)?(?:\\([^)]*\\)|\\w+)\\s*=>/g,
-            /(\\w+)\\s*\\([^)]*\\)\\s*{/g
+            // JavaScript/TypeScript patterns
+            /function\s+(\w+)/g,
+            /const\s+(\w+)\s*=\s*(?:async\s*)?(?:\([^)]*\)|\w+)\s*=>/g,
+            /(\w+)\s*\([^)]*\)\s*{/g,
+            // C++ patterns
+            /(?:void|int|float|double|string|bool|char|auto)\s+(\w+)\s*\([^)]*\)\s*[{;]/g,
+            /^\s*(\w+)::(\w+)\s*\(/gm,
+            /template\s*<[^>]*>\s*(?:void|int|float|double|string|bool|char|auto)\s+(\w+)/g
         ];
         patterns.forEach(pattern => {
             let match;
@@ -334,18 +522,25 @@ class EmbeddedAITerminal {
     }
     extractClasses(content) {
         const classes = [];
-        const classPattern = /class\\s+(\\w+)/g;
-        let match;
-        while ((match = classPattern.exec(content)) !== null) {
-            classes.push({ name: match[1] });
-        }
+        const patterns = [
+            /class\s+(\w+)/g,
+            /struct\s+(\w+)/g,
+            /namespace\s+(\w+)/g // C++ namespaces
+        ];
+        patterns.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(content)) !== null) {
+                classes.push({ name: match[1] });
+            }
+        });
         return classes;
     }
     extractImports(content) {
         const imports = [];
         const patterns = [
-            /import.*from\\s*['\"]([^'\"]+)['\"]/g,
-            /require\\s*\\(\\s*['\"]([^'\"]+)['\"]\\s*\\)/g
+            /import.*from\s*['"]([^'"]+)['"]/g,
+            /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+            /#include\s*[<"]([^>"]+)[>"]/g // C++ includes
         ];
         patterns.forEach(pattern => {
             let match;

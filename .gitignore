@@ -9,3 +9,7 @@ yarn-error.log*
 .env.production.local
 *.log
 .DS_Store
+.vscode/
+.claude/
+.ai-terminal-embeddings.db
+.ai-terminal-models/
