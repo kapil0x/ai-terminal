@@ -1,0 +1,152 @@
+{
+  "name": "ai-terminal-vscode",
+  "displayName": "AI Terminal - Architecture-Aware Code Assistant",
+  "description": "Intelligent code suggestions that understand your project's architecture and patterns",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "code-completion",
+    "architecture",
+    "ml",
+    "ast",
+    "copilot-alternative"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiTerminal.analyzeFile",
+        "title": "Analyze Current File",
+        "category": "AI Terminal"
+      },
+      {
+        "command": "aiTerminal.rebuildEmbeddings",
+        "title": "Rebuild Project Embeddings",
+        "category": "AI Terminal"
+      },
+      {
+        "command": "aiTerminal.showArchitecture",
+        "title": "Show Architecture Patterns",
+        "category": "AI Terminal"
+      },
+      {
+        "command": "aiTerminal.configure",
+        "title": "Configure AI Terminal",
+        "category": "AI Terminal"
+      }
+    ],
+    "configuration": {
+      "title": "AI Terminal",
+      "properties": {
+        "aiTerminal.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for AI service (Groq/OpenAI)",
+          "scope": "application"
+        },
+        "aiTerminal.apiUrl": {
+          "type": "string",
+          "default": "https://api.groq.com/openai/v1",
+          "description": "API URL for AI service",
+          "scope": "application"
+        },
+        "aiTerminal.model": {
+          "type": "string",
+          "default": "llama3-70b-8192",
+          "description": "AI model to use for suggestions",
+          "scope": "application"
+        },
+        "aiTerminal.enableInlineSuggestions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable inline code suggestions",
+          "scope": "resource"
+        },
+        "aiTerminal.enableBackgroundAnalysis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable background AST analysis",
+          "scope": "resource"
+        },
+        "aiTerminal.suggestionTriggerDelay": {
+          "type": "number",
+          "default": 500,
+          "description": "Delay in ms before triggering suggestions",
+          "scope": "resource"
+        }
+      }
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "aiTerminal.analyzeFile",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "aiTerminal.analyzeFile",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "aiTerminal.rebuildEmbeddings"
+        },
+        {
+          "command": "aiTerminal.showArchitecture"
+        },
+        {
+          "command": "aiTerminal.configure"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "aiTerminal.analyzeFile",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^3.6.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.6.0",
+    "axios": "^1.4.0",
+    "sqlite3": "^5.1.6"
+  },
+  "publisher": "ai-terminal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kapil0x/ai-terminal"
+  },
+  "bugs": {
+    "url": "https://github.com/kapil0x/ai-terminal/issues"
+  },
+  "homepage": "https://github.com/kapil0x/ai-terminal#readme",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  }
+}
