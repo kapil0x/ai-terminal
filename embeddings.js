@@ -1,4 +1,3 @@
-const { pipeline } = require('@xenova/transformers');
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
@@ -30,6 +29,9 @@ class CodeEmbeddings {
 
   async initializeEmbeddingModel() {
     try {
+      // Dynamically import transformers to handle ES module
+      const { pipeline } = await import('@xenova/transformers');
+      
       // Try CodeT5 first
       this.model = await pipeline('feature-extraction', 'Salesforce/codet5-base', {
         device: 'cpu',
@@ -42,6 +44,9 @@ class CodeEmbeddings {
       console.log('CodeT5 unavailable, trying alternative models...');
       
       try {
+        // Dynamically import transformers for fallback
+        const { pipeline } = await import('@xenova/transformers');
+        
         // Fallback to a smaller, more reliable model
         this.model = await pipeline('feature-extraction', 'sentence-transformers/all-MiniLM-L6-v2', {
           device: 'cpu',

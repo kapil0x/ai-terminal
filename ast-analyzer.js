@@ -815,6 +815,21 @@ class ASTAnalyzer {
     return attributes;
   }
 
+  extractAccessSpecifiers(classBody) {
+    const specifiers = [];
+    const accessRegex = /(public|private|protected)\s*:/g;
+    let match;
+    
+    while ((match = accessRegex.exec(classBody)) !== null) {
+      specifiers.push({
+        type: match[1],
+        position: match.index
+      });
+    }
+    
+    return specifiers;
+  }
+
   extractCppMembers(classBody) {
     const members = [];
     const memberRegex = /(?:(public|private|protected)\s*:)?\s*(?:(static|mutable)\s+)?(\w+(?:\s*\*)*)\s+(\w+)(?:\s*=\s*[^;]+)?;/g;

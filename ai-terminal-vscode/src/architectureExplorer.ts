@@ -264,26 +264,45 @@ export class ArchitectureExplorer {
         if (patterns.length === 0) {
             return `
                 <h3>📊 Architecture Summary</h3>
-                <p>No specific architectural patterns have been detected yet. AI Terminal is still analyzing your codebase structure.</p>
+                <p>🔍 <strong>Analysis Status:</strong> Ready to analyze your codebase</p>
+                <p>💡 <strong>Next Step:</strong> Run "AI Terminal: Rebuild Project Embeddings" to detect architectural patterns</p>
+                <p>🏗️ <strong>What we'll find:</strong> Design patterns, code relationships, and architectural insights specific to your project</p>
             `;
         }
         
         const patternCount = patterns.length;
-        const highConfidencePatterns = patterns.filter(p => p.confidence > 0.8).length;
+        const highConfidencePatterns = patterns.filter(p => p.confidence && p.confidence > 0.8).length;
         
-        const mostCommonPattern = patterns.reduce((prev, current) => 
-            (prev.confidence > current.confidence) ? prev : current
-        );
+        const mostCommonPattern = patterns.reduce((prev, current) => {
+            const prevConf = prev.confidence || 0;
+            const currConf = current.confidence || 0;
+            return prevConf > currConf ? prev : current;
+        });
+        
+        // Calculate total evidence strength
+        const totalEvidence = patterns.reduce((sum, p) => sum + (p.confidence || 0.5), 0);
+        const avgConfidence = totalEvidence / patterns.length;
         
         return `
             <h3>📊 Architecture Summary</h3>
             <ul>
                 <li><strong>${patternCount}</strong> architectural patterns detected</li>
-                <li><strong>${highConfidencePatterns}</strong> high-confidence patterns</li>
+                <li><strong>${highConfidencePatterns}</strong> high-confidence patterns (${(avgConfidence * 100).toFixed(0)}% average confidence)</li>
                 <li><strong>Primary pattern:</strong> ${mostCommonPattern.pattern || mostCommonPattern}</li>
                 <li><strong>Architecture style:</strong> ${this.inferArchitecturalStyle(patterns)}</li>
+                <li><strong>Evidence strength:</strong> ${this.getEvidenceStrength(patterns)}</li>
             </ul>
         `;
+    }
+    
+    private getEvidenceStrength(patterns: any[]): string {
+        const totalEvidence = patterns.reduce((sum, p) => sum + (p.confidence || 0.5), 0);
+        const avgConfidence = totalEvidence / patterns.length;
+        
+        if (avgConfidence > 0.8) return "Very Strong";
+        if (avgConfidence > 0.6) return "Strong"; 
+        if (avgConfidence > 0.4) return "Moderate";
+        return "Weak";
     }
     
     private inferArchitecturalStyle(patterns: any[]): string {
