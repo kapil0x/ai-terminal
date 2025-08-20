@@ -124,7 +124,7 @@ aiterm fix myfile.js --backup
 ```
 Automatically fixes common code issues and bugs.
 
-## 🧠 Local ML + Codebase Learning (Revolutionary!)
+## 🧠 Local ML + Codebase Learning 
 
 Unlike other AI tools, ai-terminal combines local machine learning with cloud LLMs for superior context understanding:
 
