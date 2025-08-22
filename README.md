@@ -18,6 +18,10 @@ A powerful terminal-based AI assistant for developers. Features code review, ref
 - 🎨 Colorful terminal interface
 - 📈 Status monitoring
 
+## Requirements
+
+- Node.js 18.0.0 or higher (required for local embeddings)
+
 ## Installation
 
 1. Clone or download this project
