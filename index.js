@@ -432,7 +432,7 @@ ${code}
 const templatesDir = path.join(os.homedir(), '.ai-terminal-templates');
 const contextDir = path.join(os.homedir(), '.ai-terminal-context');
 const CodeEmbeddings = require('./embeddings');
-const ContextEvaluator = require('./evaluation');
+const ContextEvaluator = require('./tests/evaluation');
 
 // Ensure directories exist
 if (!fs.existsSync(templatesDir)) {
