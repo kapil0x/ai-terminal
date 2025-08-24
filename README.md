@@ -49,9 +49,38 @@ aiterm config
 ```
 
 You'll be prompted to:
-- Choose AI service (Groq, OpenAI or Custom API)
+- Choose AI service (Groq, OpenAI, Ollama, or Custom API)
 - Enter your API key
 - Set custom API URL (if needed)
+
+### Ollama (Local AI) Setup
+
+For 100% local, privacy-first AI:
+
+```bash
+# 1. Install Ollama
+brew install ollama
+
+# 2. Start Ollama and pull a model
+ollama serve
+ollama pull llama3.2:1b  # Fast, small model
+ollama pull codellama    # Better for code analysis
+
+# 3. Configure ai-terminal
+aiterm config
+# Choose option 3: Ollama (local)
+# Press Enter for API key
+
+# 4. Test with local models
+aiterm ask "Explain this code" -m "codellama"
+aiterm review main.js -m "llama3.2:1b"
+```
+
+**Benefits:**
+- ✅ Complete privacy - no data leaves your machine
+- ✅ Works offline
+- ✅ No API costs or rate limits
+- ✅ Combined with local embeddings for superior code understanding
 
 ## Usage
 
