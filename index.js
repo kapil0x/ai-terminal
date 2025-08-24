@@ -50,9 +50,10 @@ program
     console.log('Choose AI service:');
     console.log('1. Groq (recommended)');
     console.log('2. OpenAI');
-    console.log('3. Custom API');
+    console.log('3. Ollama (local)');
+    console.log('4. Custom API');
     
-    rl.question('Select option (1-3): ', (choice) => {
+    rl.question('Select option (1-4): ', (choice) => {
       let service = 'Groq';
       let apiUrl = 'https://api.groq.com/openai/v1';
       
@@ -60,18 +61,27 @@ program
         service = 'OpenAI';
         apiUrl = 'https://api.openai.com/v1';
       } else if (choice === '3') {
+        service = 'Ollama';
+        apiUrl = 'http://localhost:11434/v1';
+      } else if (choice === '4') {
         service = 'Custom API';
         apiUrl = '';
       }
       
-      rl.question('Enter API key: ', (apiKey) => {
+      const keyPrompt = choice === '3' ? 'Enter API key (or press Enter for Ollama): ' : 'Enter API key: ';
+      rl.question(keyPrompt, (apiKey) => {
+        // For Ollama, use dummy key if none provided
+        if (choice === '3' && !apiKey.trim()) {
+          apiKey = 'ollama-local';
+        }
+        
         if (!apiKey.trim()) {
           console.log(chalk.red('❌ API key is required'));
           rl.close();
           return;
         }
         
-        if (choice === '3') {
+        if (choice === '4') {
           rl.question('Enter API URL: ', (customUrl) => {
             config.set('service', service);
             config.set('apiKey', apiKey);
@@ -83,7 +93,11 @@ program
           config.set('service', service);
           config.set('apiKey', apiKey);
           config.set('apiUrl', apiUrl);
-          console.log(chalk.green('✓ Configuration saved!'));
+          if (choice === '3') {
+            console.log(chalk.green('✓ Configuration saved! Make sure Ollama is running: ollama serve'));
+          } else {
+            console.log(chalk.green('✓ Configuration saved!'));
+          }
           rl.close();
         }
       });
