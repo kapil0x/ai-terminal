@@ -59,7 +59,14 @@ For 100% local, privacy-first AI:
 
 ```bash
 # 1. Install Ollama
+# macOS
 brew install ollama
+
+# Linux
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Windows
+# Download from https://ollama.ai/download
 
 # 2. Start Ollama and pull a model
 ollama serve
